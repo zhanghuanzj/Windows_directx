@@ -6,6 +6,7 @@ const int SCREENW = 1024;
 const int SCREENH = 768;
 
 Sprite ship, asteroid1, asteroid2;
+Sprite hero;
 
 LPDIRECT3DTEXTURE9 imgShip = NULL;
 LPDIRECT3DTEXTURE9 imgAsteroid = NULL;
