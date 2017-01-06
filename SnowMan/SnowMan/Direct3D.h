@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <iostream>
 #include "SnowMan.h"
+#include "Cube.h"
 
 
 using namespace std;
@@ -31,15 +32,15 @@ private:
 
 	IDirect3DDevice9* pD3DXDevice;
 
-	float *z_buffer_;
 	int width_;
 	int height_;
-	int buffer_size_;
 	LPD3DXFONT font;
 	RECT formatRect;
 	LPD3DXMESH box;
 	
-	SnowMan *snowMan;
+	SnowMan *snowMan1 = nullptr;
+	SnowMan *snowMan2 = nullptr;
+	Cube *cube = nullptr;
 };
 
 

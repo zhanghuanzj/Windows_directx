@@ -50,16 +50,10 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	D3DXCreateFont(pD3DXDevice, 36, 0, 0, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, 0, "微软雅黑", &font);
 	GetClientRect(hwnd, &formatRect);
 
-	snowMan = new SnowMan(pD3DXDevice);
+	snowMan1 = new SnowMan(pD3DXDevice);
+	snowMan2 = new SnowMan(pD3DXDevice);
+	cube = new Cube(pD3DXDevice);
 	//D3DXCreateBox(pD3DXDevice, 2, 2, 2, &box, NULL);
-
-	D3DMATERIAL9 mtrl;
-	::ZeroMemory(&mtrl, sizeof(mtrl));
-	mtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
-	mtrl.Diffuse = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
-	mtrl.Specular = D3DXCOLOR(0.3f, 0.3f, 0.3f, 0.3f);
-	//mtrl.Emissive = D3DXCOLOR(0.3f, 0.0f, 0.1f, 1.0f);
-	pD3DXDevice->SetMaterial(&mtrl);
 
 	D3DLIGHT9 light;
 	::ZeroMemory(&light, sizeof(light));
@@ -71,13 +65,14 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pD3DXDevice->SetLight(0, &light);
 	pD3DXDevice->LightEnable(0, true);
 	// 设置渲染状态
-	//pD3DXDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	pD3DXDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	pD3DXDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pD3DXDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
 	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(150, 150, 150));   //设置一下环境光
+	pD3DXDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 
-
+	transformSetting();
 	return true;
 }
 
@@ -112,19 +107,29 @@ void DirectX::snowmanRender()
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	pD3DXDevice->BeginScene();
 
-	transformSetting();
+	
 	formatRect.top = 100;
 	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
-	//static float n = 1;
-	//float angle = n*0.03f;
-	//D3DXMATRIX rotate;
-	//D3DXMatrixRotationY(&rotate,angle);
-	//++n;
-	//if (angle >= 360) n = 0;
-	//D3DXMATRIX d;
-	//D3DXMatrixTranslation(&d, 3.0f, -3.0f, 0.0f);
-	//pD3DXDevice->SetTransform(D3DTS_WORLD, &rotate);
-	snowMan->draw_snowMan();
+	static float n = 1;
+	float angle = n*0.03f;
+	D3DXMATRIX rotate;
+	D3DXMatrixRotationY(&rotate,angle);
+	++n;
+	if (angle >= 360) n = 0;
+	D3DXMATRIX d;
+	D3DXMatrixTranslation(&d, 3.0f, -3.0f, 0.0f);
+	//rotate = d*rotate;//move then rotate
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &rotate);
+	snowMan1->draw_snowMan();
+
+	D3DXMATRIX cubeMatrix;
+	D3DXMatrixTranslation(&cubeMatrix, 0.0f, -4.0f, 0.0f);
+	cubeMatrix *= rotate;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
+	cube->draw_cube();
+
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &d);
+	snowMan2->draw_snowMan();
 
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);

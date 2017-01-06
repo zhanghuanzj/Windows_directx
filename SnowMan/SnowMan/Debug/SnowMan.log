@@ -1,11 +1,15 @@
 ﻿  Direct3D.cpp
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(67): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(100): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(107): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(113): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-  正在生成代码...
-  正在跳过...(未检测到相关更改)
-  Window.cpp
-  Main.cpp
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(21): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(22): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(23): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(24): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(128): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(139): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(145): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(155): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(165): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(173): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(179): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(185): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
   SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.exe
   SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.pdb (Full PDB)
