@@ -152,8 +152,10 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Direct3D.h" />
+    <ClInclude Include="DirectInput.h" />
     <ClInclude Include="SnowMan.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />

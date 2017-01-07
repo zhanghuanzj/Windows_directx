@@ -45,6 +45,12 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	width_ = width;
 	height_ = height;
 
+	//Camera
+	pCamera = new Camera(pD3DXDevice,width,height);
+
+	pDirectInput = new DirectInput();
+	pDirectInput->init(hwnd, hInstance, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+
 	//Font setting
 	font = nullptr;
 	D3DXCreateFont(pD3DXDevice, 36, 0, 0, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, 0, "微软雅黑", &font);
@@ -53,7 +59,6 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	snowMan1 = new SnowMan(pD3DXDevice);
 	snowMan2 = new SnowMan(pD3DXDevice);
 	cube = new Cube(pD3DXDevice);
-	//D3DXCreateBox(pD3DXDevice, 2, 2, 2, &box, NULL);
 
 	D3DLIGHT9 light;
 	::ZeroMemory(&light, sizeof(light));
@@ -72,42 +77,42 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(150, 150, 150));   //设置一下环境光
 	pD3DXDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 
-	transformSetting();
 	return true;
 }
 
-void DirectX::transformSetting()
+void DirectX::update()
 {
-	//1.set view transform
-	D3DXMATRIX matView; 
-	D3DXVECTOR3 vEye(0.0f, 0.0f, -15.0f);
-	D3DXVECTOR3 vAt(0.0f, 0.0f, 0.0f); 
-	D3DXVECTOR3 vUp(0.0f, 1.0f, 0.0f);
-	D3DXMatrixLookAtLH(&matView, &vEye, &vAt, &vUp); 
-	pD3DXDevice->SetTransform(D3DTS_VIEW, &matView); 
+	pDirectInput->get_input();
 
-	//2.set project transform
-	D3DXMATRIX matProj; //定义一个矩阵
-	D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, 1.0f, 1.0f, 1000.0f); //计算投影变换矩阵
-	pD3DXDevice->SetTransform(D3DTS_PROJECTION, &matProj);  //设置投影变换矩阵
+	// camera move by keyboard
+	if (pDirectInput->is_key_down(DIK_A))  pCamera->move_alongRV(-0.3f);
+	if (pDirectInput->is_key_down(DIK_D))  pCamera->move_alongRV(0.3f);
+	if (pDirectInput->is_key_down(DIK_W)) pCamera->move_alongLV(0.3f);
+	if (pDirectInput->is_key_down(DIK_S))  pCamera->move_alongLV(-0.3f);
+	if (pDirectInput->is_key_down(DIK_R))  pCamera->move_alongUV(0.3f);
+	if (pDirectInput->is_key_down(DIK_F))  pCamera->move_alongUV(-0.3f);
 
-	//3.set viewport transform
-	D3DVIEWPORT9 vp; 
-	vp.X = 0;		
-	vp.Y = 0;		
-	vp.Width = width_;	
-	vp.Height = height_; 
-	vp.MinZ = 0.0f; 
-	vp.MaxZ = 1.0f;	
-	pD3DXDevice->SetViewport(&vp); 
+	// camera rotate by keyboard
+	if (pDirectInput->is_key_down(DIK_LEFT))  pCamera->rotate_UV(-0.003f);
+	if (pDirectInput->is_key_down(DIK_RIGHT))  pCamera->rotate_UV(0.003f);
+	if (pDirectInput->is_key_down(DIK_UP))  pCamera->rotate_RV(-0.003f);
+	if (pDirectInput->is_key_down(DIK_DOWN))  pCamera->rotate_RV(0.003f);
+	if (pDirectInput->is_key_down(DIK_Q)) pCamera->rotate_LV(0.001f);
+	if (pDirectInput->is_key_down(DIK_E)) pCamera->rotate_LV(-0.001f);
+
+	// camera rotate by mouse
+	pCamera->rotate_UV(pDirectInput->mouseDX()* 0.001f);
+	pCamera->rotate_RV(pDirectInput->mouseDY()* 0.001f);
+
+	pCamera->set_transform();
 }
 
 void DirectX::snowmanRender()
 {
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	pD3DXDevice->BeginScene();
-
 	
+	update();
 	formatRect.top = 100;
 	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
 	static float n = 1;
@@ -136,16 +141,10 @@ void DirectX::snowmanRender()
 }
 DirectX::~DirectX()
 {
-	if (pD3DXDevice != nullptr)
-	{
-		pD3DXDevice->Release();
-	}
-	if (box != nullptr)
-	{
-		box->Release();
-	}
-	if (font != nullptr)
-	{
-		font->Release();
-	}
+	SAFE_RELEASE(pD3DXDevice);
+	SAFE_RELEASE(font);
+	delete snowMan1;
+	delete snowMan2;
+	delete pCamera;
+	delete cube;
 }

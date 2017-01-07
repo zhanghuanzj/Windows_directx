@@ -7,6 +7,8 @@
 #include <iostream>
 #include "SnowMan.h"
 #include "Cube.h"
+#include "Camera.h"
+#include "DirectInput.h"
 
 
 using namespace std;
@@ -22,7 +24,7 @@ public:
 	}
 	//³õÊ¼»¯DirectX
 	bool initialDirectX(HINSTANCE hInstance, HWND hWnd, int width, int height);
-	void transformSetting();
+	void update();
 	void snowmanRender();
 	//Îö¹¹
 	~DirectX();
@@ -36,11 +38,12 @@ private:
 	int height_;
 	LPD3DXFONT font;
 	RECT formatRect;
-	LPD3DXMESH box;
 	
 	SnowMan *snowMan1 = nullptr;
 	SnowMan *snowMan2 = nullptr;
 	Cube *cube = nullptr;
+	Camera *pCamera = nullptr;
+	DirectInput *pDirectInput = nullptr;
 };
 
 

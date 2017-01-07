@@ -11,5 +11,9 @@ c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(165): w
 c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(173): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
 c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(179): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
 c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(185): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(156): warning C4244: “初始化”: 从“float”转换到“const int”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(12): warning C4244: “参数”: 从“const int”转换到“FLOAT”，可能丢失数据
+c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(60): warning C4244: “参数”: 从“const int”转换到“FLOAT”，可能丢失数据
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
   SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.exe
   SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.pdb (Full PDB)
