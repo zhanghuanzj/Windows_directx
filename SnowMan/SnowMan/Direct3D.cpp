@@ -59,6 +59,12 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	snowMan1 = new SnowMan(pD3DXDevice);
 	snowMan2 = new SnowMan(pD3DXDevice);
 	cube = new Cube(pD3DXDevice);
+	terrian = new Terrian(pD3DXDevice);
+	terrian->load_terrain_from_file("terrian.raw", "land.jpg");
+	terrian->init_terrain(200, 200, 300.0f, 18.0f);
+
+	skyBox = new SkyBox(pD3DXDevice,1500);
+	skyBox->loadSkyTextureFromFile("Textures\\frontsnow.jpg","Textures\\backsnow.jpg","Textures\\leftsnow.jpg","Textures\\rightsnow.jpg", "Textures\\topsnow.jpg");
 
 	D3DLIGHT9 light;
 	::ZeroMemory(&light, sizeof(light));
@@ -69,8 +75,8 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	light.Direction = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 	pD3DXDevice->SetLight(0, &light);
 	pD3DXDevice->LightEnable(0, true);
-	// ÉèÖÃäÖÈ¾×´Ì¬
-	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, false);
 	pD3DXDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	pD3DXDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pD3DXDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
@@ -83,28 +89,8 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 void DirectX::update()
 {
 	pDirectInput->get_input();
-
-	// camera move by keyboard
-	if (pDirectInput->is_key_down(DIK_A))  pCamera->move_alongRV(-0.3f);
-	if (pDirectInput->is_key_down(DIK_D))  pCamera->move_alongRV(0.3f);
-	if (pDirectInput->is_key_down(DIK_W)) pCamera->move_alongLV(0.3f);
-	if (pDirectInput->is_key_down(DIK_S))  pCamera->move_alongLV(-0.3f);
-	if (pDirectInput->is_key_down(DIK_R))  pCamera->move_alongUV(0.3f);
-	if (pDirectInput->is_key_down(DIK_F))  pCamera->move_alongUV(-0.3f);
-
-	// camera rotate by keyboard
-	if (pDirectInput->is_key_down(DIK_LEFT))  pCamera->rotate_UV(-0.003f);
-	if (pDirectInput->is_key_down(DIK_RIGHT))  pCamera->rotate_UV(0.003f);
-	if (pDirectInput->is_key_down(DIK_UP))  pCamera->rotate_RV(-0.003f);
-	if (pDirectInput->is_key_down(DIK_DOWN))  pCamera->rotate_RV(0.003f);
-	if (pDirectInput->is_key_down(DIK_Q)) pCamera->rotate_LV(0.001f);
-	if (pDirectInput->is_key_down(DIK_E)) pCamera->rotate_LV(-0.001f);
-
-	// camera rotate by mouse
-	pCamera->rotate_UV(pDirectInput->mouseDX()* 0.001f);
-	pCamera->rotate_RV(pDirectInput->mouseDY()* 0.001f);
-
-	pCamera->set_transform();
+	pCamera->update(pDirectInput);
+	
 }
 
 void DirectX::snowmanRender()
@@ -121,20 +107,37 @@ void DirectX::snowmanRender()
 	D3DXMatrixRotationY(&rotate,angle);
 	++n;
 	if (angle >= 360) n = 0;
-	D3DXMATRIX d;
-	D3DXMatrixTranslation(&d, 3.0f, -3.0f, 0.0f);
-	//rotate = d*rotate;//move then rotate
-	pD3DXDevice->SetTransform(D3DTS_WORLD, &rotate);
+	D3DXVECTOR3 pos(-8.0f, -8.0f, 0.0f);
+	D3DXMATRIX moveMatrix;
+	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y, pos.z);
+	moveMatrix *= rotate;//move then rotate
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
 	snowMan1->draw_snowMan();
 
 	D3DXMATRIX cubeMatrix;
-	D3DXMatrixTranslation(&cubeMatrix, 0.0f, -4.0f, 0.0f);
+	D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y-4, pos.z);
 	cubeMatrix *= rotate;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
 	cube->draw_cube();
 
+	D3DXMATRIX d;
+	D3DXMatrixTranslation(&d, pos.x+4, pos.y-2, pos.z+10);
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &d);
 	snowMan2->draw_snowMan();
+
+	D3DXMATRIX terrianMatrix;
+	D3DXMatrixTranslation(&terrianMatrix, 0.0f, 0.0f, 0.0f);
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &terrianMatrix);
+	terrian->render_terrain(&terrianMatrix);
+	D3DMATERIAL9 snowMtrl;
+	::ZeroMemory(&snowMtrl, sizeof(snowMtrl));
+	snowMtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+	snowMtrl.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+	snowMtrl.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+	pD3DXDevice->SetMaterial(&snowMtrl);
+	D3DXMATRIX skyBoxMatrix;
+	D3DXMatrixTranslation(&skyBoxMatrix, 0.0f, -30.0f, 0.0f);
+	skyBox->renderSkyBox(&skyBoxMatrix);
 
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);
