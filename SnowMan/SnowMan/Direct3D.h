@@ -7,7 +7,9 @@
 #include <iostream>
 #include "SnowMan.h"
 #include "Cube.h"
+#include "Terrian.h"
 #include "Camera.h"
+#include "SkyBox.h"
 #include "DirectInput.h"
 
 
@@ -42,6 +44,8 @@ private:
 	SnowMan *snowMan1 = nullptr;
 	SnowMan *snowMan2 = nullptr;
 	Cube *cube = nullptr;
+	Terrian *terrian = nullptr;
+	SkyBox *skyBox = nullptr;
 	Camera *pCamera = nullptr;
 	DirectInput *pDirectInput = nullptr;
 };

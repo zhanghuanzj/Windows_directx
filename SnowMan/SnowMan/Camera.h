@@ -1,5 +1,6 @@
 #pragma once
 #include "Direct3D.h"
+#include "DirectInput.h"
 
 class Camera
 {
@@ -9,8 +10,10 @@ public:
 		rightVector = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
 		upVector	= D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 		lookVector	= D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		position = D3DXVECTOR3(0.0f, 0.0f, originZ); 
-		targetPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		//position = D3DXVECTOR3(0.0f, 1000.0f, -1200.0f);
+		//targetPosition = D3DXVECTOR3(0.0f, 1200.0f, 0.0f);
+		position = D3DXVECTOR3(0.0f, -10.0f, originZ); 
+		targetPosition = D3DXVECTOR3(0.0f, -10.0f, 0.0f);
 	}
 
 	//Combine the translation and rotate Matrix
@@ -132,6 +135,36 @@ public:
 		targetPosition = lookVector * D3DXVec3Length(&position);
 	}
 
+	void update(DirectInput *pDirectInput)
+	{
+		// camera move by keyboard
+		float step = 0.3f*10;
+		if (pDirectInput->is_key_down(DIK_A))  move_alongRV(-step);
+		if (pDirectInput->is_key_down(DIK_D))  move_alongRV(step);
+		if (pDirectInput->is_key_down(DIK_W)) move_alongLV(step);
+		if (pDirectInput->is_key_down(DIK_S))  move_alongLV(-step);
+		if (pDirectInput->is_key_down(DIK_R))  move_alongUV(step);
+		if (pDirectInput->is_key_down(DIK_F))  move_alongUV(-step);
+
+		// camera rotate by keyboard
+		if (pDirectInput->is_key_down(DIK_LEFT))  rotate_UV(-0.003f);
+		if (pDirectInput->is_key_down(DIK_RIGHT))  rotate_UV(0.003f);
+		if (pDirectInput->is_key_down(DIK_UP))  rotate_RV(-0.003f);
+		if (pDirectInput->is_key_down(DIK_DOWN))  rotate_RV(0.003f);
+		if (pDirectInput->is_key_down(DIK_Q)) rotate_LV(0.001f);
+		if (pDirectInput->is_key_down(DIK_E)) rotate_LV(-0.001f);
+
+		// camera rotate by mouse
+		rotate_RV(pDirectInput->mouseDY()* 0.001f);
+		D3DXMATRIX R;
+		D3DXMatrixRotationY(&R, pDirectInput->mouseDX()* 0.001f);
+		D3DXVec3TransformCoord(&lookVector, &lookVector, &R);
+		D3DXVec3TransformCoord(&upVector, &upVector, &R);
+		D3DXVec3TransformCoord(&rightVector, &rightVector, &R);
+
+		set_transform();
+	}
+
 	~Camera(){}
 
 private:
@@ -153,7 +186,7 @@ private:
 	D3DXMATRIX				projMatrix;        
 	LPDIRECT3DDEVICE9		pdev;  
 
-	const int originZ = -15.0f;
+	const int originZ = -30.0f;
 	const int WIDTH;
 	const int HEIGHT;
 };

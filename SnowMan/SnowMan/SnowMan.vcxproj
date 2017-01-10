@@ -156,7 +156,9 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="DirectInput.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SnowMan.h" />
+    <ClInclude Include="Terrian.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />

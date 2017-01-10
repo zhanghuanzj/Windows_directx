@@ -1,5 +1,6 @@
 #include "Window.h"
 
+static POINT center;
 GameWindow::GameWindow(const string name_t, const string title_t, int width, int height) :name(name_t), title(title_t), WIDTH(width), HEIGHT(height)
 {
 	//1.创建窗口类
@@ -23,36 +24,36 @@ GameWindow::GameWindow(const string name_t, const string title_t, int width, int
 	hwnd = CreateWindow(name.c_str(), title.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, WIDTH, HEIGHT, NULL, NULL, wndClass.hInstance, NULL);
 
 	//4.调整大小，移动，显示，更新
-	/*RECT window_rect = { 0,0,WIDTH,HEIGHT };
+	RECT window_rect = { 0,0,WIDTH,HEIGHT };
 	AdjustWindowRectEx(&window_rect, GetWindowStyle(hwnd), GetMenu(hwnd) != NULL, GetWindowExStyle(hwnd));
-	MoveWindow(hwnd, 300, 150, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, false);*/
+	MoveWindow(hwnd, 300, 150, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, false);
 	MoveWindow(hwnd, 250, 80, WIDTH, HEIGHT, true);
 	ShowWindow(hwnd, SW_NORMAL);
 	UpdateWindow(hwnd);
 
 	DirectX::instance().initialDirectX(GetModuleHandle(nullptr), hwnd, WIDTH, HEIGHT);
-	////5.隐藏鼠标，设为屏幕中心
-	//ShowCursor(false);
-	//center.x = WIDTH / 2;
-	//center.y = HEIGHT / 2;
-	//ClientToScreen(hwnd, &center);
-	//SetCursorPos(center.x, center.y);
-	////6.限定鼠标在窗口内
-	//RECT rect;
-	//GetClientRect(hwnd, &rect);
-	//POINT left_top;
-	//left_top.x = rect.left;
-	//left_top.y = rect.top;
-	//POINT right_bottom;
-	//right_bottom.x = rect.right;
-	//right_bottom.y = rect.bottom;
-	//ClientToScreen(hwnd, &left_top);
-	//ClientToScreen(hwnd, &right_bottom);
-	//rect.left = left_top.x;
-	//rect.top = left_top.y;
-	//rect.right = right_bottom.x;
-	//rect.bottom = right_bottom.y;
-	//ClipCursor(&rect);
+	//5.隐藏鼠标，设为屏幕中心
+	ShowCursor(false);
+	center.x = WIDTH / 2;
+	center.y = HEIGHT / 2;
+	ClientToScreen(hwnd, &center);
+	SetCursorPos(center.x, center.y);
+	//6.限定鼠标在窗口内
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	POINT left_top;
+	left_top.x = rect.left;
+	left_top.y = rect.top;
+	POINT right_bottom;
+	right_bottom.x = rect.right;
+	right_bottom.y = rect.bottom;
+	ClientToScreen(hwnd, &left_top);
+	ClientToScreen(hwnd, &right_bottom);
+	rect.left = left_top.x;
+	rect.top = left_top.y;
+	rect.right = right_bottom.x;
+	rect.bottom = right_bottom.y;
+	ClipCursor(&rect);
 }
 
 /* ==============================================================================
