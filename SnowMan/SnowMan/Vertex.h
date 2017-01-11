@@ -12,3 +12,10 @@ struct Vertex
 };
 
 #define FVF_VERTEX D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1
+
+struct PointVertex
+{
+	float x, y, z;    
+	float u, v;		  
+};
+#define FVF_PVERTEX (D3DFVF_XYZ|D3DFVF_TEX1)

@@ -73,7 +73,7 @@ public:
 
 		//2.set project transform
 		D3DXMATRIX matProj; 
-		D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, (float)((double)WIDTH / HEIGHT), 1.0f, 1000.0f);
+		D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, (float)((double)WIDTH / HEIGHT), 1.0f, 100000.0f);
 		pdev->SetTransform(D3DTS_PROJECTION, &matProj); 
 
 		//3.set viewport transform
@@ -137,8 +137,9 @@ public:
 
 	void update(DirectInput *pDirectInput)
 	{
+		cout << position.y << endl;
 		// camera move by keyboard
-		float step = 0.3f*10;
+		float step = 0.3f;
 		if (pDirectInput->is_key_down(DIK_A))  move_alongRV(-step);
 		if (pDirectInput->is_key_down(DIK_D))  move_alongRV(step);
 		if (pDirectInput->is_key_down(DIK_W)) move_alongLV(step);

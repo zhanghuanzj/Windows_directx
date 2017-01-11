@@ -43,7 +43,7 @@ public:
 		cellSpacing = 0.0f;
 		heightScale = 0.0f;
 		::ZeroMemory(&terrianMaterial, sizeof(terrianMaterial));
-		terrianMaterial.Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+		terrianMaterial.Ambient = D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f);
 		terrianMaterial.Diffuse = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);
 		terrianMaterial.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 	}

@@ -44,10 +44,10 @@ private:
 
 	Texture(LPDIRECT3DDEVICE9 dev)
 	{
-		D3DXCreateTextureFromFile(dev, "snow.jpg", &snow);
-		D3DXCreateTextureFromFile(dev, "eye.jpg", &black);
-		D3DXCreateTextureFromFile(dev, "nose.jpg", &orange);
-		D3DXCreateTextureFromFile(dev, "tree.jpg", &tree);
-		D3DXCreateTextureFromFile(dev, "box.bmp", &box);
+		D3DXCreateTextureFromFile(dev, "Textures\\snow.jpg", &snow);
+		D3DXCreateTextureFromFile(dev, "Textures\\eye.jpg", &black);
+		D3DXCreateTextureFromFile(dev, "Textures\\nose.jpg", &orange);
+		D3DXCreateTextureFromFile(dev, "Textures\\tree.jpg", &tree);
+		D3DXCreateTextureFromFile(dev, "Textures\\box.bmp", &box);
 	}
 };

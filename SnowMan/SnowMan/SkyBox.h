@@ -82,8 +82,9 @@ public:
 	}
 	void renderSkyBox(D3DXMATRIX *pMatWorld)
 	{
-		//pdev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);  
-		//pdev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);   
+		pdev->SetRenderState(D3DRS_LIGHTING, false);
+		//pdev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+		//pdev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 		pdev->SetTransform(D3DTS_WORLD, pMatWorld);  
 		pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));  
 		pdev->SetFVF(FVF_VERTEX);  
@@ -93,7 +94,7 @@ public:
 			pdev->SetTexture(0, texture[i]);
 			pdev->DrawPrimitive(D3DPT_TRIANGLESTRIP, i * 4, 2);
 		}
-
+		pdev->SetRenderState(D3DRS_LIGHTING, true);
 	}
 
 };

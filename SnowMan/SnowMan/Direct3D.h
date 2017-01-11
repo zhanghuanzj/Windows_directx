@@ -10,6 +10,7 @@
 #include "Terrian.h"
 #include "Camera.h"
 #include "SkyBox.h"
+#include "SnowParticle.h"
 #include "DirectInput.h"
 
 
@@ -26,7 +27,7 @@ public:
 	}
 	//³õÊ¼»¯DirectX
 	bool initialDirectX(HINSTANCE hInstance, HWND hWnd, int width, int height);
-	void update();
+	void update(float time);
 	void snowmanRender();
 	//Îö¹¹
 	~DirectX();
@@ -47,6 +48,7 @@ private:
 	Terrian *terrian = nullptr;
 	SkyBox *skyBox = nullptr;
 	Camera *pCamera = nullptr;
+	SnowParticle *pSnowParticle = nullptr;
 	DirectInput *pDirectInput = nullptr;
 };
 

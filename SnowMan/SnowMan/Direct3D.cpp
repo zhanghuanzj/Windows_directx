@@ -60,11 +60,14 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	snowMan2 = new SnowMan(pD3DXDevice);
 	cube = new Cube(pD3DXDevice);
 	terrian = new Terrian(pD3DXDevice);
-	terrian->load_terrain_from_file("terrian.raw", "land.jpg");
+	terrian->load_terrain_from_file("Textures\\terrian.raw", "Textures\\land.jpg");
 	terrian->init_terrain(200, 200, 300.0f, 18.0f);
 
-	skyBox = new SkyBox(pD3DXDevice,1500);
-	skyBox->loadSkyTextureFromFile("Textures\\frontsnow.jpg","Textures\\backsnow.jpg","Textures\\leftsnow.jpg","Textures\\rightsnow.jpg", "Textures\\topsnow.jpg");
+	skyBox = new SkyBox(pD3DXDevice,600);
+	string picture = "snow.jpg";
+	skyBox->loadSkyTextureFromFile("Textures\\front"+picture,"Textures\\back"+picture,"Textures\\left" + picture,"Textures\\right" + picture, "Textures\\top" + picture);
+
+	pSnowParticle = new SnowParticle(pD3DXDevice);
 
 	D3DLIGHT9 light;
 	::ZeroMemory(&light, sizeof(light));
@@ -76,7 +79,7 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pD3DXDevice->SetLight(0, &light);
 	pD3DXDevice->LightEnable(0, true);
 
-	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, false);
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
 	pD3DXDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	pD3DXDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pD3DXDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
@@ -86,19 +89,18 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	return true;
 }
 
-void DirectX::update()
+void DirectX::update(float time)
 {
 	pDirectInput->get_input();
 	pCamera->update(pDirectInput);
-	
+	pSnowParticle->updateSnowParticle(time);
 }
 
 void DirectX::snowmanRender()
 {
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	pD3DXDevice->BeginScene();
-	
-	update();
+
 	formatRect.top = 100;
 	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
 	static float n = 1;
@@ -129,16 +131,12 @@ void DirectX::snowmanRender()
 	D3DXMatrixTranslation(&terrianMatrix, 0.0f, 0.0f, 0.0f);
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &terrianMatrix);
 	terrian->render_terrain(&terrianMatrix);
-	D3DMATERIAL9 snowMtrl;
-	::ZeroMemory(&snowMtrl, sizeof(snowMtrl));
-	snowMtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
-	snowMtrl.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
-	snowMtrl.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
-	pD3DXDevice->SetMaterial(&snowMtrl);
+
 	D3DXMATRIX skyBoxMatrix;
-	D3DXMatrixTranslation(&skyBoxMatrix, 0.0f, -30.0f, 0.0f);
+	D3DXMatrixTranslation(&skyBoxMatrix, 0.0f, -130.0f, 0.0f);
 	skyBox->renderSkyBox(&skyBoxMatrix);
 
+	pSnowParticle->renderSnowParticle();
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }

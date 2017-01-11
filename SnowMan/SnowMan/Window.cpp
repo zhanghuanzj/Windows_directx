@@ -81,6 +81,7 @@ void GameWindow::message_dispatch()
 			curTime = GetTickCount();
 			if (curTime - preTime>30)
 			{
+				DirectX::instance().update(curTime-preTime);
 				preTime = curTime;
 				DirectX::instance().snowmanRender();
 			}
