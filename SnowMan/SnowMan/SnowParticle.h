@@ -1,6 +1,7 @@
 #pragma once
 #include "Direct3D.h"
 #include "Vertex.h"
+#include "CommonUtil.h"
 #define  NUMBER		25000   
 #define  LENGTH_X	600   
 #define  WIDTH_Z	600   
@@ -35,7 +36,7 @@ public:
 		for (int i = 0; i < NUMBER; i++)
 		{
 			snows[i].x = float(rand() % LENGTH_X - LENGTH_X / 2);
-			snows[i].z = float(rand() % WIDTH_Z - WIDTH_Z / 2);
+			snows[i].z = float(rand() % WIDTH_Z - WIDTH_Z / 2)+100;
 			snows[i].y = float(rand() % HEIGHT_Y);
 			snows[i].rotationY = (rand() % 100) / 50.0f*D3DX_PI;
 			snows[i].rotationX = (rand() % 100) / 50.0f*D3DX_PI;
@@ -94,7 +95,7 @@ public:
 			if (snows[i].y < -10.0f)
 			{
 				snows[i].x = float(rand() % LENGTH_X - LENGTH_X / 2);
-				snows[i].z = float(rand() % WIDTH_Z - WIDTH_Z / 2);
+				snows[i].z = float(rand() % WIDTH_Z - WIDTH_Z / 2)+100;
 				snows[i].y = HEIGHT_Y;
 			}
 			snows[i].rotationY += snows[i].rotationSpeed * fElapsedTime;
@@ -104,12 +105,12 @@ public:
 	}
 	void renderSnowParticle()
 	{
-		pdev->SetRenderState(D3DRS_LIGHTING, false);
+		//pdev->SetRenderState(D3DRS_LIGHTING, false);
 
 		//pdev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);  
 		//pdev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);  
-		pdev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);  
-		pdev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR); 
+		//pdev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);  
+		//pdev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR); 
 
 																	 
 		pdev->SetRenderState(D3DRS_ALPHABLENDENABLE, true);   

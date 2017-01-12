@@ -69,6 +69,9 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 
 	pSnowParticle = new SnowParticle(pD3DXDevice);
 
+	pTree = new Model(pD3DXDevice,"Textures\\Tree.X");
+	pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
+
 	D3DLIGHT9 light;
 	::ZeroMemory(&light, sizeof(light));
 	light.Type = D3DLIGHT_DIRECTIONAL;
@@ -101,6 +104,7 @@ void DirectX::snowmanRender()
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	pD3DXDevice->BeginScene();
 
+
 	formatRect.top = 100;
 	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
 	static float n = 1;
@@ -111,13 +115,13 @@ void DirectX::snowmanRender()
 	if (angle >= 360) n = 0;
 	D3DXVECTOR3 pos(-8.0f, -8.0f, 0.0f);
 	D3DXMATRIX moveMatrix;
-	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y-0.5, pos.z);
 	moveMatrix *= rotate;//move then rotate
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
 	snowMan1->draw_snowMan();
 
 	D3DXMATRIX cubeMatrix;
-	D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y-4, pos.z);
+	D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y-4.5, pos.z);
 	cubeMatrix *= rotate;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
 	cube->draw_cube();
@@ -133,19 +137,67 @@ void DirectX::snowmanRender()
 	terrian->render_terrain(&terrianMatrix);
 
 	D3DXMATRIX skyBoxMatrix;
-	D3DXMatrixTranslation(&skyBoxMatrix, 0.0f, -130.0f, 0.0f);
+	D3DXMatrixTranslation(&skyBoxMatrix, 20.0f, -130.0f, -20.0f);
 	skyBox->renderSkyBox(&skyBoxMatrix);
+
+	treeRender(pos);
+
 
 	pSnowParticle->renderSnowParticle();
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
+
+void DirectX::treeRender(D3DXVECTOR3 pos)
+{
+	D3DXMATRIX treeMatrix;
+	float scale = 0.08f;
+	D3DXMatrixScaling(&treeMatrix, scale, scale, scale);
+
+	D3DXMATRIX matrix;
+	D3DXMatrixTranslation(&matrix, pos.x - 6, pos.y - 7, pos.z);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree->renderModel();
+
+	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y + 7, pos.z);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree->renderModel();
+
+	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y-2 , pos.z+60);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree->renderModel();
+
+
+	D3DXMatrixTranslation(&matrix, pos.x + 6, pos.y - 7, pos.z);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree1->renderModel();
+
+	D3DXMatrixTranslation(&matrix, pos.x + 60, pos.y+15 , pos.z);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree1->renderModel();
+
+	D3DXMatrixTranslation(&matrix, pos.x + 60, pos.y +3, pos.z + 60);
+	matrix = treeMatrix*matrix;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
+	pTree1->renderModel();
+}
 DirectX::~DirectX()
 {
 	SAFE_RELEASE(pD3DXDevice);
 	SAFE_RELEASE(font);
-	delete snowMan1;
-	delete snowMan2;
-	delete pCamera;
-	delete cube;
+	SAFE_DELETE(snowMan1);
+	SAFE_DELETE(snowMan2);
+	SAFE_DELETE(pCamera);
+	SAFE_DELETE(cube);
+	SAFE_DELETE(terrian);
+	SAFE_DELETE(skyBox);
+	SAFE_DELETE(pSnowParticle);
+	SAFE_DELETE(pDirectInput);
+	SAFE_DELETE(pTree);
+	SAFE_DELETE(pTree1);
 }

@@ -153,9 +153,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CommonUtil.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="DirectInput.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SnowMan.h" />
     <ClInclude Include="SnowParticle.h" />

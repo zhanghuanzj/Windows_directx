@@ -5,6 +5,7 @@
 #include <d3dx9.h>
 #include <windows.h>
 #include <iostream>
+#include "CommonUtil.h"
 #include "SnowMan.h"
 #include "Cube.h"
 #include "Terrian.h"
@@ -12,6 +13,7 @@
 #include "SkyBox.h"
 #include "SnowParticle.h"
 #include "DirectInput.h"
+#include "Model.h"
 
 
 using namespace std;
@@ -29,6 +31,7 @@ public:
 	bool initialDirectX(HINSTANCE hInstance, HWND hWnd, int width, int height);
 	void update(float time);
 	void snowmanRender();
+	void treeRender(D3DXVECTOR3 pos);
 	//Îö¹¹
 	~DirectX();
 
@@ -50,6 +53,9 @@ private:
 	Camera *pCamera = nullptr;
 	SnowParticle *pSnowParticle = nullptr;
 	DirectInput *pDirectInput = nullptr;
+	Model *pTree = nullptr;
+	Model *pTree1 = nullptr;
+
 };
 
 

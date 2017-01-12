@@ -1,10 +1,8 @@
 #pragma once
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <windows.h>
+#include "Direct3D.h"
 #include "Texture.h"
 #include "Vertex.h"
-#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
+#include "CommonUtil.h"
 
 
 

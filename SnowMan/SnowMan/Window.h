@@ -8,6 +8,7 @@
 #include <windowsx.h>
 
 #include "Direct3D.h"
+#include "CommonUtil.h"
 
 using namespace std;
 

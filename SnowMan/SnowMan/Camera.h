@@ -137,7 +137,6 @@ public:
 
 	void update(DirectInput *pDirectInput)
 	{
-		cout << position.y << endl;
 		// camera move by keyboard
 		float step = 0.3f;
 		if (pDirectInput->is_key_down(DIK_A))  move_alongRV(-step);

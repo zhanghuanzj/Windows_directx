@@ -57,6 +57,7 @@ public:
 public:
 	bool load_terrain_from_file(const string &rawFileName, const string &textureFile)
 	{
+		cout << rawFileName << endl;
 		ifstream inFile;
 		inFile.open(rawFileName, ios::binary); 
 
