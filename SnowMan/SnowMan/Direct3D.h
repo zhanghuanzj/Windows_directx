@@ -55,6 +55,9 @@ private:
 	DirectInput *pDirectInput = nullptr;
 	Model *pTree = nullptr;
 	Model *pTree1 = nullptr;
+	Model *pHouse = nullptr;
+
+	Camera *pLCamera = nullptr;
 
 };
 

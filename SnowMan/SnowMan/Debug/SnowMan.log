@@ -1,22 +1,4 @@
-﻿  Direct3D.cpp
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(19): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(20): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(21): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(22): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(126): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(137): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(143): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(153): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(163): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(171): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(177): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\snowman.h(183): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\terrian.h(65): warning C4244: “参数”: 从“std::streamoff”转换到“unsigned int”，可能丢失数据
-  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(189): warning C4244: “初始化”: 从“float”转换到“const int”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(15): warning C4244: “参数”: 从“const int”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\camera.h(63): warning C4244: “参数”: 从“const int”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\direct3d.cpp(118): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-c:\users\dell\documents\github\windows_directx\snowman\snowman\direct3d.cpp(124): warning C4244: “参数”: 从“double”转换到“FLOAT”，可能丢失数据
-  SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.exe
-  SnowMan.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.pdb (Full PDB)
+﻿  Main.cpp
+c:\users\dell\documents\github\windows_directx\snowman\snowman\main.cpp(133): warning C4305: “参数”: 从“double”到“FLOAT”截断
+MSVCRTD.lib(exe_main.obj) : error LNK2019: 无法解析的外部符号 _main，该符号在函数 "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ) 中被引用
+C:\Users\Dell\Documents\GitHub\Windows_directx\SnowMan\Debug\SnowMan.exe : fatal error LNK1120: 1 个无法解析的外部命令

@@ -37,6 +37,15 @@ public:
 				}
 			}
 		}
+
+		if (!(mesh->GetFVF()&D3DFVF_NORMAL))
+		{
+			LPD3DXMESH tempMesh = nullptr;
+			mesh->CloneMeshFVF(D3DXMESH_MANAGED, mesh->GetFVF() | D3DFVF_NORMAL, pdev, &tempMesh);
+			D3DXComputeNormals(tempMesh, 0);
+			mesh->Release();
+			mesh = tempMesh;
+		}
 		//Optimize
 		mesh->OptimizeInplace(D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_STRIPREORDER,
 			(DWORD*)pAdjacencyBuffer->GetBufferPointer(), nullptr, nullptr, nullptr);
@@ -59,8 +68,16 @@ public:
 public: 
 	void renderModel()
 	{
+		D3DMATERIAL9				terrianMaterial;
+		::ZeroMemory(&terrianMaterial, sizeof(terrianMaterial));
+		terrianMaterial.Ambient = D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f);
+		terrianMaterial.Diffuse = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);
+		terrianMaterial.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+		pdev->SetRenderState(D3DRS_LIGHTING, true);
 		for (DWORD i=0;i<numMaterials;i++) 
 		{
+			//cout << materials[i].Diffuse.r<<" "<<materials[i].Diffuse.g <<""<<materials[i].Diffuse.b<< endl;
+			//pdev->SetMaterial(&terrianMaterial);
 			pdev->SetMaterial(&materials[i]);
 			pdev->SetTexture(0, textures[i]);
 			mesh->DrawSubset(i);
