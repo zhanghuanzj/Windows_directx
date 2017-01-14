@@ -1,12 +1,11 @@
 #include "Direct3D.h"
-IDirect3DVertexShader9* BasicShader = 0; //顶点着色器指针
-ID3DXConstantTable* BasicConstTable = 0; //常量表指针
-D3DXHANDLE WVPMatrixHandle = 0;
-D3DXHANDLE ColorHandle = 0;
-ID3DXMesh* Teapot = 0; //指向程序中D3D茶壶模型的指针
+LPD3DXEFFECT pEffect;
 
 LPD3DXMESH texMesh;
 LPD3DXMESH mesh;
+int DirectX::n = 1;
+D3DXVECTOR4 DirectX::LightAmbient = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
+D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int height)
 {
 	//1.创建接口
@@ -77,69 +76,32 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pSnowParticle = new SnowParticle(pD3DXDevice);
 
 	pTree = new Model(pD3DXDevice,"Textures\\Tree.X");
-	pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
+	//pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
 	//pHouse = new Model(pD3DXDevice,"Textures\\House.X");
 
-	D3DLIGHT9 light;
-	::ZeroMemory(&light, sizeof(light));
-	light.Type = D3DLIGHT_DIRECTIONAL;
-	light.Ambient = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
-	light.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
-	light.Specular = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
-	light.Direction = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
-	pD3DXDevice->SetLight(0, &light);
-	pD3DXDevice->LightEnable(0, true);
+	//D3DLIGHT9 light;
+	//::ZeroMemory(&light, sizeof(light));
+	//light.Type = D3DLIGHT_DIRECTIONAL;
+	//light.Ambient = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
+	//light.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+	//light.Specular = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
+	//light.Direction = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+	//pD3DXDevice->SetLight(0, &light);
+	//pD3DXDevice->LightEnable(0, true);
 
-	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
+	//pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
 	pD3DXDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	pD3DXDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pD3DXDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
 	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(250, 250, 250));   //设置一下环境光
 	pD3DXDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 
-	ID3DXBuffer* shaderBuffer = 0;
-	//用于接受错误信息
-	ID3DXBuffer* errorBuffer = 0;
-	//编译着色器代码
-	D3DXCompileShaderFromFile("BasicHLSL.txt", //着色器代码文件名
-		0,
-		0,
-		"SetColor", //入口函数名称
-		"vs_2_0", //顶点着色器版本号
-		D3DXSHADER_DEBUG,// Debug模式编译      
-		&shaderBuffer, //指向编译后的着色器代码的指针
-		&errorBuffer,
-		&BasicConstTable); //常量表指针
-	pD3DXDevice->CreateVertexShader((DWORD*)shaderBuffer->GetBufferPointer(), &BasicShader);
-	D3DXHANDLE WVPMatrixHandle = 0;
-	D3DXHANDLE ColorHandle = 0;
-	WVPMatrixHandle = BasicConstTable->GetConstantByName(0, "WVPMatrix");
-	ColorHandle = BasicConstTable->GetConstantByName(0, "color");
-	BasicConstTable->SetDefaults(pD3DXDevice);
+	LPD3DXBUFFER pCode = nullptr;
+	D3DXCreateEffectFromFile(pD3DXDevice, "VertexShader.fx",nullptr, nullptr, 0, nullptr, &pEffect, &pCode);
+	pEffect->SetVector(LIGHTDIFFUSE, &LightDiffuse);
+	pEffect->SetVector(LIGHTAMBIENT, &LightAmbient);
+	pEffect->SetTechnique("DefaultTech");
 
-
-
-	D3DXCreateSphere(pD3DXDevice, 3, 10, 10, &mesh, nullptr);
-	// Get a copy of the sphere mesh
-	mesh->CloneMeshFVF(D3DXMESH_SYSTEMMEM, FVF_VERTEX, pD3DXDevice, &texMesh);
-	// Release original mesh
-	mesh->Release();
-	// add texture coordinates
-	Vertex* pVerts;
-	if (SUCCEEDED(texMesh->LockVertexBuffer(0, (void**)&pVerts)))
-	{
-		// Get vertex count
-		int numVerts = texMesh->GetNumVertices();
-		for (int i = 0; i < numVerts; ++i)
-		{
-			// Calculates texture coordinates
-			pVerts->tu = asinf(pVerts->norm.x) / D3DX_PI + 0.5f; //(-1, 1)-->(0, 1)
-			pVerts->tv = asinf(pVerts->norm.y) / D3DX_PI + 0.5f;
-			++pVerts;
-		}
-		// Unlock the vertex buffer
-		texMesh->UnlockVertexBuffer();
-	}
 	return true;
 }
 
@@ -148,55 +110,41 @@ void DirectX::update(float time)
 	pDirectInput->get_input();
 	pCamera->update(pDirectInput);
 	//pSnowParticle->updateSnowParticle(time);
+	// 1.世界矩阵
+	D3DXMATRIXA16 matWorld;
+	pD3DXDevice->GetTransform(D3DTS_WORLD, &matWorld);
+	pEffect->SetMatrix(WORLD_MATRIX, &matWorld);
+	// 2.观察矩阵
+	D3DXMATRIXA16 matView;
+	pD3DXDevice->GetTransform(D3DTS_VIEW, &matView);
+	pEffect->SetMatrix(VIEW_MATRIX, &matView);
+	// 3.投影矩阵
+	D3DXMATRIXA16 matProj;
+	pD3DXDevice->GetTransform(D3DTS_PROJECTION, &matProj);
+	pEffect->SetMatrix(PROJ_MATRIX, &matProj);
 }
 
 void DirectX::snowmanRender()
 {
-	D3DMATERIAL9 mtrl;
-	::ZeroMemory(&mtrl, sizeof(mtrl));
-	mtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.7f, 1.0f);
-	mtrl.Diffuse = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
-	mtrl.Specular = D3DXCOLOR(0.3f, 0.3f, 0.3f, 0.3f);
-	mtrl.Emissive = D3DXCOLOR(0.3f, 0.0f, 0.1f, 1.0f);
-	pD3DXDevice->SetMaterial(&mtrl);
-
-
-	D3DXMATRIX terrianMatrix;
-	D3DXMatrixTranslation(&terrianMatrix, 0.0f, 0.0f, 0.0f);
-	pD3DXDevice->SetTransform(D3DTS_WORLD, &terrianMatrix);
-
-	//得到世界矩阵、观察矩阵和投影矩阵
-	D3DXMATRIX matWorld, matView, matProj;
-	D3DXMatrixTranslation(&matWorld, 0.0f, -10.0f, -30.0f);
-	pD3DXDevice->GetTransform(D3DTS_WORLD, &matWorld);
-	pD3DXDevice->GetTransform(D3DTS_VIEW, &matView);
-	pD3DXDevice->GetTransform(D3DTS_PROJECTION, &matProj);
-	D3DXMATRIX matWVP = matWorld * matView * matProj;
-	//通过句柄对着色器中的WVPMatrix变量进行赋值
-	BasicConstTable->SetMatrix(pD3DXDevice, WVPMatrixHandle, &matWVP);
-	D3DXVECTOR4 color(1.0f, 1.0f, 1.0f, 1.0f);
-	//通过句柄对着色器中的color变量进行赋值，这里我们赋值为黄色
-	BasicConstTable->SetVector(pD3DXDevice, ColorHandle, &color);
-
-
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	pD3DXDevice->BeginScene();
 
-
 	formatRect.top = 100;
 	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
-	//static float n = 1;
-	//float angle = n*0.03f;
-	//D3DXMATRIX rotate;
-	//D3DXMatrixRotationY(&rotate,angle);
-	//++n;
-	//if (angle >= 360) n = 0;
+	
+	float angle = n*0.03f;
+	++n;
+	if (angle >= 360) n = 0;
+
+
 	D3DXVECTOR3 pos(-8.0f, -8.0f, 0.0f);
-	//D3DXMATRIX moveMatrix;
-	//D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y-0.5, pos.z);
-	//moveMatrix *= rotate;//move then rotate
-	//pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
-	//snowMan1->draw_snowMan();
+	D3DXMATRIX rotate;
+	D3DXMatrixRotationY(&rotate, angle);
+	D3DXMATRIX moveMatrix;
+	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y-0.5, pos.z);
+	moveMatrix *= rotate;//move then rotate
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
+	snowMan1->draw_snowMan(pEffect);
 
 	//D3DXMATRIX cubeMatrix;
 	//D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y-4.5, pos.z);
@@ -204,14 +152,19 @@ void DirectX::snowmanRender()
 	//pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
 	//cube->draw_cube();
 
+	
+	//UINT iPass, cPasses;
+	//pEffect->Begin(&cPasses, 0);
+	//for (iPass = 0; iPass < cPasses; iPass++)
+	//{
+	//	pEffect->BeginPass(iPass);
+	//	//texMesh->DrawSubset(0);
+	//	snowMan1->draw_snowMan();
+	//	pEffect->EndPass();
+	//}
+	//pEffect->End();
 
 	
-
-	
-	//把顶点着色器设定到渲染管道
-	//pD3DXDevice->SetVertexShader(BasicShader);
-
-	texMesh->DrawSubset(0);
 	//D3DXMATRIX d;
 	//D3DXMatrixTranslation(&d, pos.x+4, pos.y-2, pos.z+10);
 	//pD3DXDevice->SetTransform(D3DTS_WORLD, &d);

@@ -58,7 +58,9 @@ private:
 	Model *pHouse = nullptr;
 
 	Camera *pLCamera = nullptr;
-
+	static int n;
+	static D3DXVECTOR4 LightDiffuse;
+	static D3DXVECTOR4 LightAmbient;
 };
 
 
