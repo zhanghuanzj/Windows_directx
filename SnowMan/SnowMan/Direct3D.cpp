@@ -4,8 +4,9 @@ LPD3DXEFFECT pEffect;
 LPD3DXMESH texMesh;
 LPD3DXMESH mesh;
 int DirectX::n = 1;
-D3DXVECTOR4 DirectX::LightAmbient = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
-D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
+D3DXVECTOR4 DirectX::LightAmbient = D3DXVECTOR4(0.4f, 0.4f, 0.4f, 1.0f);
+D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.1f, 1.1f, 1.1f, 1.0f);
+D3DMATERIAL9 snowMtrl;
 bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int height)
 {
 	//1.创建接口
@@ -76,24 +77,31 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pSnowParticle = new SnowParticle(pD3DXDevice);
 
 	pTree = new Model(pD3DXDevice,"Textures\\Tree.X");
-	//pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
-	//pHouse = new Model(pD3DXDevice,"Textures\\House.X");
+	pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
+	pHouse = new Model(pD3DXDevice,"Textures\\House.X");
 
-	//D3DLIGHT9 light;
-	//::ZeroMemory(&light, sizeof(light));
-	//light.Type = D3DLIGHT_DIRECTIONAL;
-	//light.Ambient = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
-	//light.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
-	//light.Specular = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
-	//light.Direction = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
-	//pD3DXDevice->SetLight(0, &light);
-	//pD3DXDevice->LightEnable(0, true);
 
-	//pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
+	::ZeroMemory(&snowMtrl, sizeof(snowMtrl));
+	snowMtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+	snowMtrl.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+	snowMtrl.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+	pD3DXDevice->SetMaterial(&snowMtrl);
+
+	D3DLIGHT9 light;
+	::ZeroMemory(&light, sizeof(light));
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Ambient = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
+	light.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+	light.Specular = D3DXCOLOR(0.6f, 0.6f, 0.6f, 1.0f);
+	light.Direction = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+	pD3DXDevice->SetLight(0, &light);
+	pD3DXDevice->LightEnable(0, true);
+
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
 	pD3DXDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	pD3DXDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pD3DXDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
-	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(250, 250, 250));   //设置一下环境光
+	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(150, 150, 150));   //设置一下环境光
 	pD3DXDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 
 	LPD3DXBUFFER pCode = nullptr;
@@ -109,16 +117,12 @@ void DirectX::update(float time)
 {
 	pDirectInput->get_input();
 	pCamera->update(pDirectInput);
-	//pSnowParticle->updateSnowParticle(time);
-	// 1.世界矩阵
-	D3DXMATRIXA16 matWorld;
-	pD3DXDevice->GetTransform(D3DTS_WORLD, &matWorld);
-	pEffect->SetMatrix(WORLD_MATRIX, &matWorld);
-	// 2.观察矩阵
+	pSnowParticle->updateSnowParticle(time);
+	// 1.观察矩阵
 	D3DXMATRIXA16 matView;
 	pD3DXDevice->GetTransform(D3DTS_VIEW, &matView);
 	pEffect->SetMatrix(VIEW_MATRIX, &matView);
-	// 3.投影矩阵
+	// 2.投影矩阵
 	D3DXMATRIXA16 matProj;
 	pD3DXDevice->GetTransform(D3DTS_PROJECTION, &matProj);
 	pEffect->SetMatrix(PROJ_MATRIX, &matProj);
@@ -146,38 +150,28 @@ void DirectX::snowmanRender()
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
 	snowMan1->draw_snowMan(pEffect);
 
-	//D3DXMATRIX cubeMatrix;
-	//D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y-4.5, pos.z);
-	//cubeMatrix *= rotate;
-	//pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
-	//cube->draw_cube();
+	D3DXMATRIX cubeMatrix;
+	D3DXMatrixTranslation(&cubeMatrix, pos.x, pos.y - 4.5, pos.z);
+	cubeMatrix *= rotate;
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &cubeMatrix);
+	cube->draw_cube(pEffect);
 
-	
-	//UINT iPass, cPasses;
-	//pEffect->Begin(&cPasses, 0);
-	//for (iPass = 0; iPass < cPasses; iPass++)
-	//{
-	//	pEffect->BeginPass(iPass);
-	//	//texMesh->DrawSubset(0);
-	//	snowMan1->draw_snowMan();
-	//	pEffect->EndPass();
-	//}
-	//pEffect->End();
+	D3DXMATRIX d;
+	D3DXMatrixTranslation(&d, pos.x + 4, pos.y - 2, pos.z + 10);
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &d);
+	snowMan2->draw_snowMan(pEffect);
 
-	
-	//D3DXMATRIX d;
-	//D3DXMatrixTranslation(&d, pos.x+4, pos.y-2, pos.z+10);
-	//pD3DXDevice->SetTransform(D3DTS_WORLD, &d);
-	//snowMan2->draw_snowMan();
-
-	/*D3DXMATRIX terrianMatrix;
+	D3DXMATRIX terrianMatrix;
 	D3DXMatrixTranslation(&terrianMatrix, 0.0f, 0.0f, 0.0f);
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &terrianMatrix);
-	terrian->render_terrain(&terrianMatrix);
+	terrian->render_terrain(pEffect);
 
+	light_off();
 	D3DXMATRIX skyBoxMatrix;
 	D3DXMatrixTranslation(&skyBoxMatrix, 20.0f, -130.0f, -20.0f);
-	skyBox->renderSkyBox(&skyBoxMatrix);
+	pD3DXDevice->SetTransform(D3DTS_WORLD, &skyBoxMatrix);
+	skyBox->renderSkyBox(nullptr);
+	light_on();
 
 	treeRender(pos);
 
@@ -188,9 +182,9 @@ void DirectX::snowmanRender()
 	D3DXMatrixTranslation(&houseMatrix, pos.x, pos.y - 5, pos.z + 80);
 	houseMatrix = matrix*houseMatrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &houseMatrix);
-	pHouse->renderModel();
+	pHouse->renderModel(pEffect);
 
-	pSnowParticle->renderSnowParticle();*/
+	pSnowParticle->renderSnowParticle();
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
@@ -205,33 +199,53 @@ void DirectX::treeRender(D3DXVECTOR3 pos)
 	D3DXMatrixTranslation(&matrix, pos.x - 6, pos.y - 7, pos.z);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree->renderModel();
+	pTree->renderModel(pEffect);
 
 	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y + 7, pos.z);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree->renderModel();
+	pTree->renderModel(pEffect);
 
 	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y-2 , pos.z+60);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree->renderModel();
+	pTree->renderModel(pEffect);
 
 
 	D3DXMatrixTranslation(&matrix, pos.x + 6, pos.y - 7, pos.z);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree1->renderModel();
+	pTree1->renderModel(pEffect);
 
 	D3DXMatrixTranslation(&matrix, pos.x + 60, pos.y+15 , pos.z);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree1->renderModel();
+	pTree1->renderModel(pEffect);
 
 	D3DXMatrixTranslation(&matrix, pos.x + 60, pos.y +3, pos.z + 60);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
-	pTree1->renderModel();
+	pTree1->renderModel(pEffect);
+}
+
+void DirectX::light_on()
+{
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, true);
+	if (pEffect)
+	{
+		pEffect->SetVector(LIGHTDIFFUSE, &LightDiffuse);
+		pEffect->SetVector(LIGHTAMBIENT, &LightAmbient);
+	}
+	
+}
+void DirectX::light_off()
+{
+	pD3DXDevice->SetRenderState(D3DRS_LIGHTING, false);
+	if (pEffect)
+	{
+		pEffect->SetVector(LIGHTDIFFUSE, new D3DXVECTOR4(0, 0, 0, 0));
+		pEffect->SetVector(LIGHTAMBIENT, new D3DXVECTOR4(1, 1, 1, 1));
+	}
 }
 DirectX::~DirectX()
 {

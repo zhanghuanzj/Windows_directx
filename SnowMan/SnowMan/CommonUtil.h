@@ -38,3 +38,11 @@
 #ifndef LIGHTAMBIENT
 #define LIGHTAMBIENT "LightAmbient"
 #endif
+
+struct Object
+{
+	LPD3DXMESH mesh;
+	D3DMATERIAL9 material;
+	D3DXMATRIX matrix;
+	LPDIRECT3DTEXTURE9 texture;
+};

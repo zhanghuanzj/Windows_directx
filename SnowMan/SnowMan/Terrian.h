@@ -166,28 +166,48 @@ public:
 		//cout << normal.x << " " << normal.y << " " << normal.z << endl;
 	}
 
-	bool render_terrain(D3DXMATRIX *pMatWorld)
+	bool render_terrain(LPD3DXEFFECT pEffect = nullptr)
 	{
-		pdev->SetMaterial(&terrianMaterial);
-		pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
-		pdev->SetFVF(FVF_VERTEX);
-		pdev->SetIndices(indexBuffer);
-		pdev->SetTexture(0, texture);
-
+		D3DXMATRIX worldMatrix;
+		pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
 		D3DXMATRIX terrianMatrix;
 		D3DXMatrixScaling(&terrianMatrix, 0.01f, 0.01f, 0.01f);
 		D3DXMATRIX terrianMatrix1;
 		D3DXMatrixTranslation(&terrianMatrix1, 2500, -2000.0f, -2000);
+		terrianMatrix = (*worldMatrix)*terrianMatrix1*terrianMatrix;
+		//pEffect = nullptr;
+		if (pEffect != nullptr)
+		{
+			pEffect->SetTexture(TEXTURE, texture);
+			pEffect->SetMatrix(WORLD_MATRIX, &terrianMatrix);
+			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(terrianMaterial.Diffuse.r, terrianMaterial.Diffuse.g, terrianMaterial.Diffuse.b, terrianMaterial.Diffuse.a));
+			UINT iPass, cPasses;
+			pEffect->Begin(&cPasses, 0);
+			for (iPass = 0; iPass < cPasses; iPass++)
+			{
+				pEffect->BeginPass(iPass);
+				pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+				pdev->SetFVF(FVF_VERTEX);
+				pdev->SetIndices(indexBuffer);
+				pdev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+					numVertices, 0, numVertices * 2);
+				pEffect->EndPass();
+			}
+			pEffect->End();
+		}
+		else
+		{
+			pdev->SetMaterial(&terrianMaterial);
+			pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+			pdev->SetFVF(FVF_VERTEX);
+			pdev->SetIndices(indexBuffer);
+			pdev->SetTexture(0, texture);
 
-		//pdev->SetRenderState(D3DRS_LIGHTING, FALSE);
-		terrianMatrix = (*pMatWorld)*terrianMatrix1*terrianMatrix;
-		pdev->SetTransform(D3DTS_WORLD, &terrianMatrix);
-		pdev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
-			numVertices, 0, numVertices * 2);		
-
-		pdev->SetTransform(D3DTS_WORLD, pMatWorld);
-		//pdev->SetRenderState(D3DRS_LIGHTING, TRUE);  
-		pdev->SetTexture(0, 0);	
+			pdev->SetTransform(D3DTS_WORLD, &terrianMatrix);
+			pdev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+				numVertices, 0, numVertices * 2);
+		}
+		
 		return true;
 	}
 };

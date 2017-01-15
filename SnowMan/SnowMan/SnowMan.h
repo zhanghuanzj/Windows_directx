@@ -4,21 +4,19 @@
 #include "Vertex.h"
 #include "CommonUtil.h"
 
-
+using namespace std;
 
 class SnowMan
 {
 public:
-	SnowMan(LPDIRECT3DDEVICE9 dev,float radius=1.0f,int slices = 100,int stacks = 100)
+	SnowMan(LPDIRECT3DDEVICE9 dev, float radius = 1.0f, int slices = 100, int stacks = 100) :pdev(dev), r(radius), objects(9)
 	{
-		pdev = dev;
-		r = radius;
-		
+
 		body = get_sphere(size*radius);
 		head = get_sphere(radius);
 		eye = get_cylinder(r*0.1, r*0.1, r*0.1);
 		nose = get_cylinder(r*0.04, r*0.12, r*0.7);
-		arm = get_cylinder(r*0.04, r*0.06,r);
+		arm = get_cylinder(r*0.04, r*0.06, r);
 		hand = get_cylinder(r*0.03, r*0.06, 0.2*r);
 		::ZeroMemory(&snowMtrl, sizeof(snowMtrl));
 		snowMtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
@@ -29,7 +27,43 @@ public:
 		eyeMtrl.Ambient = D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f);
 		eyeMtrl.Diffuse = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
 		eyeMtrl.Specular = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
-		
+
+		D3DXMATRIX matrix;
+		D3DXMatrixTranslation(&matrix, 0.0f, 0.0f, 0.0f);
+		D3DXMATRIX bodyMatrix;
+		D3DXMatrixTranslation(&bodyMatrix, 0.0f, -(size + 0.3)*r, 0.0f);
+		D3DXMATRIX eyeMatrixL, eyeMatrixR;
+		D3DXMatrixTranslation(&eyeMatrixL, -0.4*r, 0.4*r, -0.9*r);
+		D3DXMatrixTranslation(&eyeMatrixR, 0.4*r, 0.4*r, -0.9*r);
+		D3DXMATRIX noseMatrix;
+		D3DXMatrixTranslation(&noseMatrix, 0, 0, -1.3*r);
+		D3DXMATRIX treeMatrix11;
+		D3DXMatrixTranslation(&treeMatrix11, -1.5*r, -1 * r, 0);
+		D3DXMATRIX armMatrix1;
+		D3DXMATRIX handMatrix1;
+		D3DXMatrixRotationAxis(&armMatrix1, new D3DXVECTOR3(1, 1.5, 0), D3DX_PI / 2);
+		D3DXMATRIX treeMatrix12;
+		D3DXMatrixTranslation(&treeMatrix12, -1.7*r, -0.95 * r, 0);
+		D3DXMatrixRotationAxis(&handMatrix1, new D3DXVECTOR3(0, 1, 0), D3DX_PI / 2);
+
+		D3DXMATRIX handMatrix2;
+		D3DXMATRIX armMatrix2;
+		D3DXMATRIX treeMatrix21;
+		D3DXMATRIX treeMatrix22;
+		D3DXMatrixTranslation(&treeMatrix21, 1.5*r, -1 * r, 0);
+		D3DXMatrixRotationAxis(&armMatrix2, new D3DXVECTOR3(-1, 1.5, 0), -D3DX_PI / 2);
+
+		D3DXMatrixTranslation(&treeMatrix22, 1.7*r, -0.75 * r, 0);
+		D3DXMatrixRotationAxis(&handMatrix2, new D3DXVECTOR3(1, 0, 0), D3DX_PI / 2);
+		objects[0] = {head,snowMtrl,matrix,Texture::Instance(dev).get_snow()};
+		objects[1] = {body,snowMtrl,bodyMatrix,Texture::Instance(dev). get_snow()};
+		objects[2] = { eye,eyeMtrl,eyeMatrixL,Texture::Instance(dev).get_black()};
+		objects[3] = { eye,eyeMtrl,eyeMatrixR,Texture::Instance(dev).get_black()};
+		objects[4] = { nose,eyeMtrl,noseMatrix,Texture::Instance(dev).get_orange() };
+		objects[5] = { arm,eyeMtrl,armMatrix1*treeMatrix11,Texture::Instance(dev).get_tree() };
+		objects[6] = { hand,eyeMtrl,handMatrix1*treeMatrix12,Texture::Instance(dev).get_tree() };
+		objects[7] = { arm,eyeMtrl,armMatrix2*treeMatrix21,Texture::Instance(dev).get_tree() };
+		objects[8] = { hand,eyeMtrl,handMatrix2*treeMatrix22,Texture::Instance(dev).get_tree() };
 	}
 
 	LPD3DXMESH get_sphere(float radius = 1.0f, int slices = 100, int stacks = 100)
@@ -91,29 +125,36 @@ public:
 
 	void draw_snowMan(LPD3DXEFFECT pEffect = nullptr)
 	{
+		D3DXMATRIX worldMatrix;
+		pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
 		if (pEffect==nullptr)
 		{
-			D3DXMATRIX worldMatrix;
-			pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
+			
 			draw_body(worldMatrix);
 			draw_eyes(worldMatrix);
 			draw_nose(worldMatrix);
 			draw_hands(worldMatrix);
-			pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
 		}
 		else
 		{
-			D3DXMATRIX worldMatrix;
-			pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
-			pEffect->SetMatrix(WORLD_MATRIX, &worldMatrix);
-			draw_body(worldMatrix, pEffect);
-			draw_eyes(worldMatrix, pEffect);
-			draw_nose(worldMatrix, pEffect);
-			//draw_hands(worldMatrix);
-
-			pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
+			for (int i=0;i<9;++i)
+			{
+				auto obj = objects[i];
+				D3DXMATRIX matrix = obj.matrix*worldMatrix;
+				pEffect->SetMatrix(WORLD_MATRIX, &matrix);
+				pEffect->SetTexture(TEXTURE, obj.texture);
+				pEffect->SetVector(MATERIAL, new D3DXVECTOR4(obj.material.Diffuse.r, obj.material.Diffuse.g, obj.material.Diffuse.b, obj.material.Diffuse.a));
+				UINT iPass, cPasses;
+				pEffect->Begin(&cPasses, 0);
+				for (iPass = 0; iPass < cPasses; iPass++)
+				{
+					pEffect->BeginPass(iPass);
+					obj.mesh->DrawSubset(0);
+					pEffect->EndPass();
+				}
+				pEffect->End();
+			}
 		}
-		
 	}
 
 
@@ -125,131 +166,55 @@ public:
 		SAFE_RELEASE(hand);
 		SAFE_RELEASE(nose);
 		SAFE_RELEASE(arm);
-
 	}
 
 private:
 
-	void draw_body(D3DXMATRIX worldMatrix, LPD3DXEFFECT pEffect = nullptr)
+	void draw_body(D3DXMATRIX worldMatrix)
 	{
 		D3DXMATRIX bodyMatrix;
 		D3DXMatrixTranslation(&bodyMatrix, 0.0f, -(size + 0.3)*r, 0.0f);
 		bodyMatrix *= worldMatrix;	
-		if (pEffect!=nullptr)
-		{
-			pEffect->SetTexture(TEXTURE, Texture::Instance(pdev).get_snow());
-			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(snowMtrl.Diffuse.r,snowMtrl.Diffuse.g,snowMtrl.Diffuse.b,snowMtrl.Diffuse.a));
-			for (int i=0;i<2;i++) 
-			{
-				LPD3DXMESH object = nullptr;
-				if (i==0)
-				{
-					object = head;
-				}
-				else
-				{
-					pEffect->SetMatrix(WORLD_MATRIX, &bodyMatrix);
-					object = body;
-				}
-				UINT iPass, cPasses;
-				pEffect->Begin(&cPasses, 0);
-				for (iPass = 0; iPass < cPasses; iPass++)
-				{
-					pEffect->BeginPass(iPass);
-					object->DrawSubset(0);
-					pEffect->EndPass();
-				}
-				pEffect->End();
-			}
-			pEffect->SetMatrix(WORLD_MATRIX, &worldMatrix);
-		}
-		else
-		{
-			pdev->SetMaterial(&snowMtrl);
-			pdev->SetTexture(0, Texture::Instance(pdev).get_snow());
-			head->DrawSubset(0);
-			pdev->SetTransform(D3DTS_WORLD, &bodyMatrix);
-			body->DrawSubset(0);
-			pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
-		}
-		
+
+		pdev->SetMaterial(&snowMtrl);
+		pdev->SetTexture(0, Texture::Instance(pdev).get_snow());
+		head->DrawSubset(0);
+		pdev->SetTransform(D3DTS_WORLD, &bodyMatrix);
+		body->DrawSubset(0);
+		pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
 	}
 
-	void draw_eyes(D3DXMATRIX worldMatrix, LPD3DXEFFECT pEffect = nullptr)
+	void draw_eyes(D3DXMATRIX worldMatrix)
 	{
 		D3DXMATRIX eyeMatrixL,eyeMatrixR;
 		D3DXMatrixTranslation(&eyeMatrixL, -0.4*r, 0.4*r, -0.9*r);
 		D3DXMatrixTranslation(&eyeMatrixR, 0.4*r, 0.4*r, -0.9*r);
 		eyeMatrixL *= worldMatrix;
 		eyeMatrixR *= worldMatrix;
-		if (pEffect!=nullptr)
-		{
-			pEffect->SetTexture(TEXTURE, Texture::Instance(pdev).get_black());
-			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(eyeMtrl.Diffuse.r, eyeMtrl.Diffuse.g, eyeMtrl.Diffuse.b, eyeMtrl.Diffuse.a));
-			for (int i=0;i<2;i++) 
-			{
-				if (i == 0)
-				{
-					pEffect->SetMatrix(WORLD_MATRIX, &eyeMatrixL);
-				}
-				else
-				{
-					pEffect->SetMatrix(WORLD_MATRIX, &eyeMatrixR);
-				}
-				UINT iPass, cPasses;
-				pEffect->Begin(&cPasses, 0);
-				for (iPass = 0; iPass < cPasses; iPass++)
-				{
-					pEffect->BeginPass(iPass);
-					eye->DrawSubset(0);
-					pEffect->EndPass();
-				}
-				pEffect->End();
-			}
-		}
-		else
-		{
-			pdev->SetMaterial(&eyeMtrl);
-			pdev->SetTexture(0, Texture::Instance(pdev).get_black());
-			//Left
-			pdev->SetTransform(D3DTS_WORLD, &eyeMatrixL);
-			eye->DrawSubset(0);
-			//Right
-			pdev->SetTransform(D3DTS_WORLD, &eyeMatrixR);
-			eye->DrawSubset(0);
-		}
+		
+		pdev->SetMaterial(&eyeMtrl);
+		pdev->SetTexture(0, Texture::Instance(pdev).get_black());
+		//Left
+		pdev->SetTransform(D3DTS_WORLD, &eyeMatrixL);
+		eye->DrawSubset(0);
+		//Right
+		pdev->SetTransform(D3DTS_WORLD, &eyeMatrixR);
+		eye->DrawSubset(0);
 	}
 
-	void draw_nose(D3DXMATRIX worldMatrix, LPD3DXEFFECT pEffect = nullptr)
+	void draw_nose(D3DXMATRIX worldMatrix)
 	{
 		D3DXMATRIX noseMatrix;
 		D3DXMatrixTranslation(&noseMatrix, 0, 0, -1.3*r);
 		noseMatrix *= worldMatrix;
-		if (pEffect!=nullptr)
-		{
-			pEffect->SetMatrix(WORLD_MATRIX, &noseMatrix);
-			pEffect->SetTexture(TEXTURE, Texture::Instance(pdev).get_orange());
-			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(eyeMtrl.Diffuse.r, eyeMtrl.Diffuse.g, eyeMtrl.Diffuse.b, eyeMtrl.Diffuse.a));
-			UINT iPass, cPasses;
-			pEffect->Begin(&cPasses, 0);
-			for (iPass = 0; iPass < cPasses; iPass++)
-			{
-				pEffect->BeginPass(iPass);
-				nose->DrawSubset(0);
-				pEffect->EndPass();
-			}
-			pEffect->End();
-		}
-		else
-		{
-			pdev->SetTexture(0, Texture::Instance(pdev).get_orange());
-			pdev->SetTransform(D3DTS_WORLD, &noseMatrix);
-			nose->DrawSubset(0);
-		}
+		
+		pdev->SetTexture(0, Texture::Instance(pdev).get_orange());
+		pdev->SetTransform(D3DTS_WORLD, &noseMatrix);
+		nose->DrawSubset(0);
 		
 	}
 
-	void draw_hands(D3DXMATRIX worldMatrix, LPD3DXEFFECT pEffect = nullptr)
+	void draw_hands(D3DXMATRIX worldMatrix)
 	{
 		pdev->SetTexture(0, Texture::Instance(pdev).get_tree());
 		D3DXMATRIX treeMatrix;
@@ -287,7 +252,7 @@ private:
 	LPD3DXMESH nose;
 	LPD3DXMESH arm;
 	LPD3DXMESH hand;
-
+	vector<Object> objects;
 	LPDIRECT3DDEVICE9 pdev;
 
 	D3DMATERIAL9 snowMtrl;

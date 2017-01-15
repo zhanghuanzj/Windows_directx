@@ -97,27 +97,54 @@ public:
 
 		//解锁  
 		ib->Unlock();
+
+		::ZeroMemory(&material, sizeof(material));
+		material.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+		material.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+		material.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 	}
 
-	void draw_cube()
+	void draw_cube(LPD3DXEFFECT pEffect = nullptr)
 	{
-		pdev->SetTexture(0, Texture::Instance(pdev).get_box());
-		//设置数据来源  
-		pdev->SetStreamSource(0, vb, 0, sizeof(Vertex));
-		pdev->SetIndices(ib);
-		//设置灵活顶点格式  
-		pdev->SetFVF(FVF_VERTEX);
-		//绘制   
-		pdev->DrawIndexedPrimitive(
-			D3DPT_TRIANGLELIST,
-			0,
-			0,
-			24,
-			0,
-			12);
+		D3DXMATRIX worldMatrix;
+		pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
+		if (pEffect!=nullptr)
+		{
+			pEffect->SetTexture(TEXTURE, Texture::Instance(pdev).get_box());
+			pEffect->SetMatrix(WORLD_MATRIX, &worldMatrix);
+			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(material.Diffuse.r, material.Diffuse.g, material.Diffuse.b,material.Diffuse.a));
+			UINT iPass, cPasses;
+			pEffect->Begin(&cPasses, 0);
+			for (iPass = 0; iPass < cPasses; iPass++)
+			{
+				pEffect->BeginPass(iPass);
+				pdev->SetStreamSource(0, vb, 0, sizeof(Vertex));
+				pdev->SetIndices(ib);
+				//设置灵活顶点格式  
+				pdev->SetFVF(FVF_VERTEX);
+				//绘制   
+				pdev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,0,0,24,0,12);
+				pEffect->EndPass();
+			}
+			pEffect->End();
+		}
+		else
+		{
+			pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
+			pdev->SetTexture(0, Texture::Instance(pdev).get_box());
+			//设置数据来源  
+			pdev->SetStreamSource(0, vb, 0, sizeof(Vertex));
+			pdev->SetIndices(ib);
+			//设置灵活顶点格式  
+			pdev->SetFVF(FVF_VERTEX);
+			//绘制   
+			pdev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 24, 0, 12);
+		}
+		
 	}
 private:
 	IDirect3DVertexBuffer9* vb;         //顶点缓存  
 	IDirect3DIndexBuffer9*  ib;         //索引缓存  
 	LPDIRECT3DDEVICE9 pdev;
+	D3DMATERIAL9 material;
 };

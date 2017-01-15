@@ -66,22 +66,42 @@ public:
 	}
 
 public: 
-	void renderModel()
+	void renderModel(LPD3DXEFFECT pEffect = nullptr)
 	{
-		D3DMATERIAL9				terrianMaterial;
-		::ZeroMemory(&terrianMaterial, sizeof(terrianMaterial));
-		terrianMaterial.Ambient = D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f);
-		terrianMaterial.Diffuse = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);
-		terrianMaterial.Specular = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
-		pdev->SetRenderState(D3DRS_LIGHTING, true);
-		for (DWORD i=0;i<numMaterials;i++) 
+		//pEffect = nullptr;
+		D3DXMATRIX worldMatrix;
+		pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
+		if (pEffect != nullptr)
 		{
-			//cout << materials[i].Diffuse.r<<" "<<materials[i].Diffuse.g <<""<<materials[i].Diffuse.b<< endl;
-			//pdev->SetMaterial(&terrianMaterial);
-			pdev->SetMaterial(&materials[i]);
-			pdev->SetTexture(0, textures[i]);
-			mesh->DrawSubset(i);
+			pEffect->SetMatrix(WORLD_MATRIX, &worldMatrix);
+			for (DWORD i = 0; i<numMaterials; i++)
+			{
+				pEffect->SetTexture(TEXTURE, textures[i]);
+				pEffect->SetVector(MATERIAL, new D3DXVECTOR4(materials[i].Diffuse.r, materials[i].Diffuse.g, materials[i].Diffuse.b, materials[i].Diffuse.a));
+				UINT iPass, cPasses;
+				pEffect->Begin(&cPasses, 0);
+				for (iPass = 0; iPass < cPasses; iPass++)
+				{
+					pEffect->BeginPass(iPass);
+					mesh->DrawSubset(i);
+					pEffect->EndPass();
+				}
+				pEffect->End();
+			}
 		}
+		else
+		{
+			for (DWORD i = 0; i<numMaterials; i++)
+			{
+				//cout << materials[i].Diffuse.r<<" "<<materials[i].Diffuse.g <<""<<materials[i].Diffuse.b<< endl;
+				//pdev->SetMaterial(&terrianMaterial);
+				pdev->SetMaterial(&materials[i]);
+				pdev->SetTexture(0, textures[i]);
+				mesh->DrawSubset(i);
+			}
+		}
+		
+		
 	}
 
 };

@@ -80,21 +80,45 @@ public:
 		D3DXCreateTextureFromFile(pdev, pTopTextureFile.c_str(), &texture[4]);
 		return true;
 	}
-	void renderSkyBox(D3DXMATRIX *pMatWorld)
+	void renderSkyBox(LPD3DXEFFECT pEffect = nullptr)
 	{
-		pdev->SetRenderState(D3DRS_LIGHTING, false);
-		//pdev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		//pdev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		pdev->SetTransform(D3DTS_WORLD, pMatWorld);  
-		pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));  
-		pdev->SetFVF(FVF_VERTEX);  
-
-		for (int i = 0; i<5; i++)
+		D3DXMATRIX worldMatrix;
+		pdev->GetTransform(D3DTS_WORLD, &worldMatrix);
+		if (pEffect != nullptr)
 		{
-			pdev->SetTexture(0, texture[i]);
-			pdev->DrawPrimitive(D3DPT_TRIANGLESTRIP, i * 4, 2);
+			pEffect->SetTexture(TEXTURE, Texture::Instance(pdev).get_box());
+			pEffect->SetMatrix(WORLD_MATRIX, &worldMatrix);
+			pEffect->SetVector(MATERIAL, new D3DXVECTOR4(1, 1, 1,1));
+			UINT iPass, cPasses;
+			pEffect->Begin(&cPasses, 0);
+			for (iPass = 0; iPass < cPasses; iPass++)
+			{
+				pEffect->BeginPass(iPass);
+				pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+				pdev->SetFVF(FVF_VERTEX);
+
+				for (int i = 0; i<5; i++)
+				{
+					pdev->SetTexture(0, texture[i]);
+					pdev->DrawPrimitive(D3DPT_TRIANGLESTRIP, i * 4, 2);
+				}
+				pEffect->EndPass();
+			}
+			pEffect->End();
 		}
-		pdev->SetRenderState(D3DRS_LIGHTING, true);
+		else
+		{
+			pdev->SetTransform(D3DTS_WORLD, &worldMatrix);
+			pdev->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+			pdev->SetFVF(FVF_VERTEX);
+
+			for (int i = 0; i<5; i++)
+			{
+				pdev->SetTexture(0, texture[i]);
+				pdev->DrawPrimitive(D3DPT_TRIANGLESTRIP, i * 4, 2);
+			}
+		}
+		
 	}
 
 };

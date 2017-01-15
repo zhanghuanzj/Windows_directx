@@ -79,6 +79,43 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 	return tex2D(SceneSampler, Tex) * Diffuse;
 }
 
+//-----------------------------------------------------------------------------
+// Vertex Shader: VertShadow
+// Desc: Process vertex for the shadow map
+//-----------------------------------------------------------------------------
+void VertShadow(float4 Pos : POSITION,
+	float3 Normal : NORMAL,
+	out float4 oPos : POSITION,
+	out float2 Depth : TEXCOORD0)
+{
+	//
+	// Compute the projected coordinates
+	//
+	float4x4 matWorldView = mul(WorldMatrix, ViewMatrix);
+	oPos = mul(Pos, matWorldView);
+	oPos = mul(oPos, ProjMatrix);
+
+	//
+	// Store z and w in our spare texcoord
+	//
+	Depth.xy = oPos.zw;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// Pixel Shader: PixShadow
+// Desc: Process pixel for the shadow map
+//-----------------------------------------------------------------------------
+void PixShadow(float2 Depth : TEXCOORD0,
+	out float4 Color : COLOR)
+{
+	//
+	// Depth is z / w
+	//
+	Color = Depth.x / Depth.y;
+}
 
 //-----------------------------------------------------------------------------
 // Technique: RenderScene

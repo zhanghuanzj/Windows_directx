@@ -5,6 +5,7 @@
 #include <d3dx9.h>
 #include <windows.h>
 #include <iostream>
+#include <vector>
 #include "CommonUtil.h"
 #include "SnowMan.h"
 #include "Cube.h"
@@ -32,11 +33,14 @@ public:
 	void update(float time);
 	void snowmanRender();
 	void treeRender(D3DXVECTOR3 pos);
+
+	void light_on();
+	void light_off();
 	//Îö¹¹
 	~DirectX();
 
 private:
-	DirectX() :pD3DXDevice(nullptr) {}
+	DirectX() :pD3DXDevice(nullptr),objects(5) {}
 
 	IDirect3DDevice9* pD3DXDevice;
 
@@ -45,6 +49,7 @@ private:
 	LPD3DXFONT font;
 	RECT formatRect;
 	
+	vector<Object> objects;
 	SnowMan *snowMan1 = nullptr;
 	SnowMan *snowMan2 = nullptr;
 	Cube *cube = nullptr;
