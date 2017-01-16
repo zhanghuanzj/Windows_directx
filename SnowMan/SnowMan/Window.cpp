@@ -83,7 +83,7 @@ void GameWindow::message_dispatch()
 			{
 				DirectX::instance().update(curTime-preTime);
 				preTime = curTime;
-				DirectX::instance().snowmanRender();
+				DirectX::instance().render();
 			}
 		}
 	}

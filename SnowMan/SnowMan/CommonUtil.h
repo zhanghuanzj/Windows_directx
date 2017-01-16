@@ -23,12 +23,24 @@
 #define PROJ_MATRIX "ProjMatrix"
 #endif
 
+#ifndef VIEW_LIGHT_PROJ_MATRIX
+#define VIEW_LIGHT_PROJ_MATRIX "ViewToLightProjMatrix"
+#endif
+
 #ifndef TEXTURE
 #define TEXTURE "ColorTexture"
 #endif
 
+#ifndef SHADOW
+#define SHADOW "ShadowTexture"
+#endif
+
 #ifndef MATERIAL
 #define MATERIAL "Material"
+#endif
+
+#ifndef LIGHTDIR
+#define LIGHTDIR "LightDir"
 #endif
 
 #ifndef LIGHTDIFFUSE
@@ -38,6 +50,8 @@
 #ifndef LIGHTAMBIENT
 #define LIGHTAMBIENT "LightAmbient"
 #endif
+
+
 
 struct Object
 {

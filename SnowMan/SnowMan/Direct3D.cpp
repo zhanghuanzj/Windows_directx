@@ -6,6 +6,7 @@ LPD3DXMESH mesh;
 int DirectX::n = 1;
 D3DXVECTOR4 DirectX::LightAmbient = D3DXVECTOR4(0.4f, 0.4f, 0.4f, 1.0f);
 D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.1f, 1.1f, 1.1f, 1.0f);
+D3DXVECTOR4 DirectX::LightDirection = D3DXVECTOR4(1.0f, -1.0f, 0.0f, 0.0f);
 D3DMATERIAL9 snowMtrl;
 bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int height)
 {
@@ -64,7 +65,7 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	GetClientRect(hwnd, &formatRect);
 
 	snowMan1 = new SnowMan(pD3DXDevice);
-	snowMan2 = new SnowMan(pD3DXDevice);
+	snowMan2 = new SnowMan(pD3DXDevice,1.5);
 	cube = new Cube(pD3DXDevice);
 	terrian = new Terrian(pD3DXDevice);
 	terrian->load_terrain_from_file("Textures\\terrian.raw", "Textures\\land.jpg");
@@ -80,7 +81,7 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pTree1 = new Model(pD3DXDevice, "Textures\\Tree1.X");
 	pHouse = new Model(pD3DXDevice,"Textures\\House.X");
 
-
+	caculate_light_matrix();
 	::ZeroMemory(&snowMtrl, sizeof(snowMtrl));
 	snowMtrl.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
 	snowMtrl.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
@@ -104,11 +105,25 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	pD3DXDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(150, 150, 150));   //设置一下环境光
 	pD3DXDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 
+	pD3DXDevice->CreateTexture(ShadowMap_SIZE, ShadowMap_SIZE,
+		1, D3DUSAGE_RENDERTARGET,
+		D3DFMT_R32F,
+		D3DPOOL_DEFAULT,
+		&ShadowMap,
+		NULL);
+	//D3DMULTISAMPLE_TYPE
+	pD3DXDevice->CreateDepthStencilSurface(ShadowMap_SIZE,
+		ShadowMap_SIZE,
+		D3DFMT_D24S8,
+		D3DMULTISAMPLE_NONE,
+		0,
+		TRUE,
+		&DSShadow,
+		NULL);
 	LPD3DXBUFFER pCode = nullptr;
 	D3DXCreateEffectFromFile(pD3DXDevice, "VertexShader.fx",nullptr, nullptr, 0, nullptr, &pEffect, &pCode);
 	pEffect->SetVector(LIGHTDIFFUSE, &LightDiffuse);
 	pEffect->SetVector(LIGHTAMBIENT, &LightAmbient);
-	pEffect->SetTechnique("DefaultTech");
 
 	return true;
 }
@@ -118,34 +133,96 @@ void DirectX::update(float time)
 	pDirectInput->get_input();
 	pCamera->update(pDirectInput);
 	pSnowParticle->updateSnowParticle(time);
-	// 1.观察矩阵
+	// 观察矩阵
 	D3DXMATRIXA16 matView;
 	pD3DXDevice->GetTransform(D3DTS_VIEW, &matView);
-	pEffect->SetMatrix(VIEW_MATRIX, &matView);
-	// 2.投影矩阵
-	D3DXMATRIXA16 matProj;
-	pD3DXDevice->GetTransform(D3DTS_PROJECTION, &matProj);
-	pEffect->SetMatrix(PROJ_MATRIX, &matProj);
+	// Light Direction 
+	D3DXVECTOR4 Dir;
+	D3DXVec4Transform(&Dir, &LightDirection, &matView);
+	D3DXVec4Normalize(&Dir, &Dir);
+	pEffect->SetVector(LIGHTDIR,&Dir);
 }
 
-void DirectX::snowmanRender()
+void DirectX::caculate_light_matrix()
+{
+	D3DXVECTOR3 rightVector = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	D3DXVECTOR3 upVector = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
+	D3DXVECTOR3 lookVector = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+	D3DXVECTOR3 position = D3DXVECTOR3(-250.0f, 250.0f, 0.0f);
+	Camera light_camera(pD3DXDevice, ShadowMap_SIZE, ShadowMap_SIZE, rightVector, upVector, lookVector,position);
+	light_camera.calculate_viewMatrix(&light_view_matrix);
+	//D3DXMatrixOrthoOffCenterLH(&light_proj_matrix, -1000,1000,-1000,1000, 1.0f, 10000.0f);
+	D3DXMatrixPerspectiveFovLH(&light_proj_matrix, D3DX_PI*0.5f, (float)ShadowMap_SIZE / (float)ShadowMap_SIZE, 1.0f, 10000.0f);
+	//D3DXMatrixOrthoLH(&light_proj_matrix,D3DX_PI*0.5f,(float)ShadowMap_SIZE/(float)ShadowMap_SIZE,1.0f,10000.0f);
+}
+void DirectX::render()
+{
+	//Save old RenderTarget and replace with the shadowMap surface
+	LPDIRECT3DSURFACE9 pOldRT = nullptr;
+	pD3DXDevice->GetRenderTarget(0, &pOldRT); 
+	LPDIRECT3DSURFACE9 pShadowSurface;
+	ShadowMap->GetSurfaceLevel(0, &pShadowSurface);
+	pD3DXDevice->SetRenderTarget(0, pShadowSurface);
+	SAFE_RELEASE(pShadowSurface);
+	//Save old DepthStentilSuface and replace with the shadowSurface
+	LPDIRECT3DSURFACE9 pOldDSS = nullptr;
+	pD3DXDevice->GetDepthStencilSurface(&pOldDSS);
+	pD3DXDevice->SetDepthStencilSurface(DSShadow);
+
+	//1.Render shadowMap
+	render_scene(true);
+
+	//recover
+	pD3DXDevice->SetDepthStencilSurface(pOldDSS);
+	pD3DXDevice->SetRenderTarget(0,pOldRT);
+	SAFE_RELEASE(pOldRT);
+	SAFE_RELEASE(pOldDSS);
+
+	//
+	pEffect->SetTexture(SHADOW, ShadowMap);
+	D3DXMATRIX viewToLightProjMatrix;
+	pCamera->calculate_viewMatrix(&viewToLightProjMatrix);
+	D3DXMatrixInverse(&viewToLightProjMatrix, nullptr, &viewToLightProjMatrix);
+	viewToLightProjMatrix = viewToLightProjMatrix*light_view_matrix*light_proj_matrix;
+	pEffect->SetMatrix(VIEW_LIGHT_PROJ_MATRIX, &viewToLightProjMatrix);
+	render_scene(false);
+	pEffect->SetTexture(SHADOW, nullptr);
+	
+}
+
+void DirectX::render_scene(bool isRenderShadow)
 {
 	pD3DXDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+	if (isRenderShadow)
+	{
+		pEffect->SetTechnique("RenderShadow");
+		pEffect->SetMatrix(VIEW_MATRIX, &light_view_matrix);
+		pEffect->SetMatrix(PROJ_MATRIX, &light_proj_matrix);
+		float angle = (n++)*0.03f;
+		if (angle >= 360) n = 0;
+	}
+	else
+	{
+		pEffect->SetTechnique("RenderScene");
+		D3DXMATRIXA16 matView;
+		pD3DXDevice->GetTransform(D3DTS_VIEW, &matView);
+		pEffect->SetMatrix(VIEW_MATRIX, &matView);
+		D3DXMATRIXA16 matProj;
+		pD3DXDevice->GetTransform(D3DTS_PROJECTION, &matProj);
+		pEffect->SetMatrix(PROJ_MATRIX, &matProj);
+		formatRect.top = 100;
+		font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
+		
+	}
 	pD3DXDevice->BeginScene();
 
-	formatRect.top = 100;
-	font->DrawText(0, "【致我们永不熄灭的游戏开发梦想】", -1, &formatRect, DT_CENTER, D3DCOLOR_XRGB(68, 139, 256));
 	
-	float angle = n*0.03f;
-	++n;
-	if (angle >= 360) n = 0;
-
 
 	D3DXVECTOR3 pos(-8.0f, -8.0f, 0.0f);
 	D3DXMATRIX rotate;
-	D3DXMatrixRotationY(&rotate, angle);
+	D3DXMatrixRotationY(&rotate, n*0.03f);
 	D3DXMATRIX moveMatrix;
-	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y-0.5, pos.z);
+	D3DXMatrixTranslation(&moveMatrix, pos.x, pos.y - 0.5, pos.z);
 	moveMatrix *= rotate;//move then rotate
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &moveMatrix);
 	snowMan1->draw_snowMan(pEffect);
@@ -157,7 +234,7 @@ void DirectX::snowmanRender()
 	cube->draw_cube(pEffect);
 
 	D3DXMATRIX d;
-	D3DXMatrixTranslation(&d, pos.x + 4, pos.y - 2, pos.z + 10);
+	D3DXMatrixTranslation(&d, pos.x + 4, pos.y, pos.z + 10);
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &d);
 	snowMan2->draw_snowMan(pEffect);
 
@@ -166,12 +243,16 @@ void DirectX::snowmanRender()
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &terrianMatrix);
 	terrian->render_terrain(pEffect);
 
-	light_off();
-	D3DXMATRIX skyBoxMatrix;
-	D3DXMatrixTranslation(&skyBoxMatrix, 20.0f, -130.0f, -20.0f);
-	pD3DXDevice->SetTransform(D3DTS_WORLD, &skyBoxMatrix);
-	skyBox->renderSkyBox(nullptr);
-	light_on();
+	if (!isRenderShadow)
+	{
+		light_off();
+		D3DXMATRIX skyBoxMatrix;
+		D3DXMatrixTranslation(&skyBoxMatrix, 20.0f, -130.0f, -20.0f);
+		pD3DXDevice->SetTransform(D3DTS_WORLD, &skyBoxMatrix);
+		skyBox->renderSkyBox(nullptr);
+		pSnowParticle->renderSnowParticle();
+		light_on();
+	}
 
 	treeRender(pos);
 
@@ -184,11 +265,10 @@ void DirectX::snowmanRender()
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &houseMatrix);
 	pHouse->renderModel(pEffect);
 
-	pSnowParticle->renderSnowParticle();
+	
 	pD3DXDevice->EndScene();
 	pD3DXDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
-
 void DirectX::treeRender(D3DXVECTOR3 pos)
 {
 	D3DXMATRIX treeMatrix;
@@ -206,7 +286,7 @@ void DirectX::treeRender(D3DXVECTOR3 pos)
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
 	pTree->renderModel(pEffect);
 
-	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y-2 , pos.z+60);
+	D3DXMatrixTranslation(&matrix, pos.x - 60, pos.y-3 , pos.z+60);
 	matrix = treeMatrix*matrix;
 	pD3DXDevice->SetTransform(D3DTS_WORLD, &matrix);
 	pTree->renderModel(pEffect);

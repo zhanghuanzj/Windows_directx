@@ -16,7 +16,7 @@
 #include "DirectInput.h"
 #include "Model.h"
 
-
+#define ShadowMap_SIZE 4096
 using namespace std;
 
 class DirectX
@@ -31,11 +31,13 @@ public:
 	//³õÊ¼»¯DirectX
 	bool initialDirectX(HINSTANCE hInstance, HWND hWnd, int width, int height);
 	void update(float time);
-	void snowmanRender();
+	void render();
+	void render_scene(bool isRenderShadow);
 	void treeRender(D3DXVECTOR3 pos);
 
 	void light_on();
 	void light_off();
+	void caculate_light_matrix();
 	//Îö¹¹
 	~DirectX();
 
@@ -43,9 +45,13 @@ private:
 	DirectX() :pD3DXDevice(nullptr),objects(5) {}
 
 	IDirect3DDevice9* pD3DXDevice;
+	LPDIRECT3DTEXTURE9              ShadowMap = nullptr;
+	LPDIRECT3DSURFACE9              DSShadow = nullptr;
 
 	int width_;
 	int height_;
+	D3DXMATRIX light_view_matrix;
+	D3DXMATRIX light_proj_matrix;
 	LPD3DXFONT font;
 	RECT formatRect;
 	
@@ -66,6 +72,8 @@ private:
 	static int n;
 	static D3DXVECTOR4 LightDiffuse;
 	static D3DXVECTOR4 LightAmbient;
+	static D3DXVECTOR4 LightDirection;
+	
 };
 
 

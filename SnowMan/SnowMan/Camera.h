@@ -5,16 +5,13 @@
 class Camera
 {
 public:
-	Camera(LPDIRECT3DDEVICE9 dev,int width,int height) :pdev(dev),WIDTH(width),HEIGHT(height)
-	{
-		rightVector = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
-		upVector	= D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		lookVector	= D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		//position = D3DXVECTOR3(0.0f, 1000.0f, -1200.0f);
-		//targetPosition = D3DXVECTOR3(0.0f, 1200.0f, 0.0f);
-		position = D3DXVECTOR3(0.0f, -10.0f, originZ); 
-		targetPosition = D3DXVECTOR3(0.0f, -10.0f, 0.0f);
-	}
+	Camera(LPDIRECT3DDEVICE9 dev,int width,int height, 
+		D3DXVECTOR3 rightVector_ = D3DXVECTOR3(1.0f, 0.0f, 0.0f),
+		D3DXVECTOR3 upVector_ = D3DXVECTOR3(0.0f, 1.0f, 0.0f),
+		D3DXVECTOR3 lookVector_ = D3DXVECTOR3(0.0f, 0.0f, 1.0f),
+		D3DXVECTOR3 position_ = D3DXVECTOR3(0.0f, -10.0f, -30.f),
+		D3DXVECTOR3 targetPosition_ = D3DXVECTOR3(0.0f, -10.0f, 0.0f)) :pdev(dev), WIDTH(width), HEIGHT(height),rightVector(rightVector_),upVector(upVector_),lookVector(lookVector_),position(position_)
+	{}
 
 	//Combine the translation and rotate Matrix
 	void calculate_viewMatrix(D3DXMATRIX *pMatrix)
@@ -73,6 +70,7 @@ public:
 
 		//2.set project transform
 		D3DXMATRIX matProj; 
+		//D3DXMatrixOrthoLH(&matProj, D3DX_PI*0.5f, (float)512000 / (float)512000, 1.0f, 10000.0f);
 		D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, (float)((double)WIDTH / HEIGHT), 1.0f, 100000.0f);
 		pdev->SetTransform(D3DTS_PROJECTION, &matProj); 
 
@@ -138,7 +136,7 @@ public:
 	void update(DirectInput *pDirectInput)
 	{
 		// camera move by keyboard
-		float step = 0.3f;
+		float step = 0.3f*15;
 		if (pDirectInput->is_key_down(DIK_A))  move_alongRV(-step);
 		if (pDirectInput->is_key_down(DIK_D))  move_alongRV(step);
 		if (pDirectInput->is_key_down(DIK_W)) move_alongLV(step);
@@ -154,6 +152,8 @@ public:
 		if (pDirectInput->is_key_down(DIK_Q)) rotate_LV(0.001f);
 		if (pDirectInput->is_key_down(DIK_E)) rotate_LV(-0.001f);
 
+		float s = pDirectInput->mouseDZ()*0.01f;
+		move_alongUV(s);
 		// camera rotate by mouse
 		rotate_RV(pDirectInput->mouseDY()* 0.001f);
 		D3DXMATRIX R;
@@ -163,6 +163,7 @@ public:
 		D3DXVec3TransformCoord(&rightVector, &rightVector, &R);
 
 		set_transform();
+		//cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
 	}
 
 	~Camera(){}
