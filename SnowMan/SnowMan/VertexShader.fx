@@ -7,10 +7,10 @@
 //-----------------------------------------------------------------------------
 
 
-#define SMAP_SIZE 4096
+#define SMAP_SIZE 3000
 
 
-#define SHADOW_EPSILON 0.00005f
+#define SHADOW_EPSILON 0.000015f
 
 
 float4x4 WorldMatrix;
@@ -101,9 +101,9 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		lerp(sourcevals[2], sourcevals[3], lerps.x),
 		lerps.y);
 
-	//float LightAmount = (tex2D(ShadowSampler, ShadowTexC) < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+	//float LightAmount = (tex2D(ShadowSampler, ShadowTexC) + SHADOW_EPSILON< vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
 	// Light
-	Diffuse = (saturate(dot(-LightDir, normalize(vNormal)))*LightAmount *(1-LightAmbient) + LightAmbient)* Material;
+	Diffuse = (saturate(dot(-LightDir, normalize(vNormal)))*LightAmount *LightDiffuse + LightAmbient)* Material;
 	return tex2D(SceneSampler, Tex) * Diffuse;
 }
 

@@ -1,4 +1,4 @@
 ﻿  源.cpp
-c:\users\dell\documents\github\windows_directx\win32project2\win32project2\源.cpp(122): warning C4305: “参数”: 从“double”到“FLOAT”截断
+c:\users\dell\documents\github\windows_directx\win32project2\win32project2\源.cpp(191): warning C4305: “参数”: 从“double”到“FLOAT”截断
   Win32Project2.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\Win32Project2\Debug\Win32Project2.exe
   Win32Project2.vcxproj -> C:\Users\Dell\Documents\GitHub\Windows_directx\Win32Project2\Debug\Win32Project2.pdb (Full PDB)

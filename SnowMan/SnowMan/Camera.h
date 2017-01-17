@@ -5,12 +5,12 @@
 class Camera
 {
 public:
-	Camera(LPDIRECT3DDEVICE9 dev,int width,int height, 
+	Camera(LPDIRECT3DDEVICE9 dev, int width, int height,
 		D3DXVECTOR3 rightVector_ = D3DXVECTOR3(1.0f, 0.0f, 0.0f),
 		D3DXVECTOR3 upVector_ = D3DXVECTOR3(0.0f, 1.0f, 0.0f),
 		D3DXVECTOR3 lookVector_ = D3DXVECTOR3(0.0f, 0.0f, 1.0f),
 		D3DXVECTOR3 position_ = D3DXVECTOR3(0.0f, -10.0f, -30.f),
-		D3DXVECTOR3 targetPosition_ = D3DXVECTOR3(0.0f, -10.0f, 0.0f)) :pdev(dev), WIDTH(width), HEIGHT(height),rightVector(rightVector_),upVector(upVector_),lookVector(lookVector_),position(position_)
+		D3DXVECTOR3 targetPosition_ = D3DXVECTOR3(0.0f, -10.0f, 0.0f)) :pdev(dev), WIDTH(width), HEIGHT(height), rightVector(rightVector_), upVector(upVector_), lookVector(lookVector_), position(position_)
 	{}
 
 	//Combine the translation and rotate Matrix
@@ -41,7 +41,7 @@ public:
 
 	void set_targetPosition(D3DXVECTOR3 *tPosition)
 	{
-		if(tPosition != nullptr)
+		if (tPosition != nullptr)
 		{
 			targetPosition = *tPosition;
 		}
@@ -61,29 +61,7 @@ public:
 		position = pos ? (*pos) : V;
 	}
 
-	void set_transform()
-	{
-		//1.set view transform
-		D3DXMATRIX matView;
-		calculate_viewMatrix(&matView);
-		pdev->SetTransform(D3DTS_VIEW, &matView);
 
-		//2.set project transform
-		D3DXMATRIX matProj; 
-		//D3DXMatrixOrthoLH(&matProj, D3DX_PI*0.5f, (float)512000 / (float)512000, 1.0f, 10000.0f);
-		D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, (float)((double)WIDTH / HEIGHT), 1.0f, 100000.0f);
-		pdev->SetTransform(D3DTS_PROJECTION, &matProj); 
-
-		//3.set viewport transform
-		D3DVIEWPORT9 vp;
-		vp.X = 0;
-		vp.Y = 0;
-		vp.Width = WIDTH;
-		vp.Height = HEIGHT;
-		vp.MinZ = 0.0f;
-		vp.MaxZ = 1.0f;
-		pdev->SetViewport(&vp);
-	}
 
 	void move_alongRV(float units)
 	{
@@ -136,7 +114,6 @@ public:
 	void update(DirectInput *pDirectInput)
 	{
 		// camera move by keyboard
-		float step = 0.3f*15;
 		if (pDirectInput->is_key_down(DIK_A))  move_alongRV(-step);
 		if (pDirectInput->is_key_down(DIK_D))  move_alongRV(step);
 		if (pDirectInput->is_key_down(DIK_W)) move_alongLV(step);
@@ -166,7 +143,35 @@ public:
 		//cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
 	}
 
-	~Camera(){}
+	void set_transform()
+	{
+		//1.set view transform
+		D3DXMATRIX matView;
+		calculate_viewMatrix(&matView);
+		pdev->SetTransform(D3DTS_VIEW, &matView);
+
+		//2.set project transform
+		D3DXMATRIX matProj;
+		D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4.0f, (float)((double)WIDTH / HEIGHT), 1.0f, 100000.0f);
+		pdev->SetTransform(D3DTS_PROJECTION, &matProj);
+
+		//3.set viewport transform
+		D3DVIEWPORT9 vp;
+		vp.X = 0;
+		vp.Y = 0;
+		vp.Width = WIDTH;
+		vp.Height = HEIGHT;
+		vp.MinZ = 0.0f;
+		vp.MaxZ = 1.0f;
+		pdev->SetViewport(&vp);
+	}
+
+	D3DXVECTOR3 get_position()
+	{
+		return position;
+	}
+
+	~Camera() {}
 
 private:
 
@@ -178,16 +183,21 @@ private:
 		D3DXVec3Cross(&rightVector, &upVector, &lookVector);
 		D3DXVec3Normalize(&rightVector, &rightVector);
 	}
-	D3DXVECTOR3				rightVector;      
-	D3DXVECTOR3				upVector;           
-	D3DXVECTOR3				lookVector;         
-	D3DXVECTOR3				position;   
-	D3DXVECTOR3				targetPosition;      
-	D3DXMATRIX				viewMatrix;       
-	D3DXMATRIX				projMatrix;        
-	LPDIRECT3DDEVICE9		pdev;  
 
-	const int originZ = -30.0f;
-	const int WIDTH;
-	const int HEIGHT;
+private:
+	LPDIRECT3DDEVICE9		pdev;
+
+	D3DXMATRIX				viewMatrix;
+	D3DXMATRIX				projMatrix;
+
+	D3DXVECTOR3				targetPosition;
+	D3DXVECTOR3				rightVector;
+	D3DXVECTOR3				upVector;
+	D3DXVECTOR3				lookVector;
+	D3DXVECTOR3				position;
+
+	const float step = 0.3f * 15;
+	const int	originZ = -30.0f;
+	const int	WIDTH;
+	const int	HEIGHT;
 };

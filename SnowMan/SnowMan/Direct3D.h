@@ -16,7 +16,7 @@
 #include "DirectInput.h"
 #include "Model.h"
 
-#define ShadowMap_SIZE 4096
+#define ShadowMap_SIZE 3000
 using namespace std;
 
 class DirectX
@@ -30,6 +30,8 @@ public:
 	}
 	//≥ı ºªØDirectX
 	bool initialDirectX(HINSTANCE hInstance, HWND hWnd, int width, int height);
+	void object_initialize();
+	void shadowMap_initialize();
 	void update(float time);
 	void render();
 	void render_scene(bool isRenderShadow);
@@ -50,6 +52,7 @@ private:
 
 	int width_;
 	int height_;
+	float offset = 0.0;
 	D3DXMATRIX light_view_matrix;
 	D3DXMATRIX light_proj_matrix;
 	LPD3DXFONT font;
@@ -61,13 +64,14 @@ private:
 	Cube *cube = nullptr;
 	Terrian *terrian = nullptr;
 	SkyBox *skyBox = nullptr;
-	Camera *pCamera = nullptr;
+
 	SnowParticle *pSnowParticle = nullptr;
 	DirectInput *pDirectInput = nullptr;
 	Model *pTree = nullptr;
 	Model *pTree1 = nullptr;
 	Model *pHouse = nullptr;
 
+	Camera *pCamera = nullptr;
 	Camera *pLCamera = nullptr;
 	static int n;
 	static D3DXVECTOR4 LightDiffuse;
