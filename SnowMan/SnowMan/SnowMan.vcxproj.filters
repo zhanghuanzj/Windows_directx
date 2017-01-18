@@ -15,58 +15,58 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Direct3D.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Direct3D.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SnowMan.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectInput.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Terrian.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SkyBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SnowParticle.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="VertexShader.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommonUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Cube.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Direct3D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DirectInput.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkyBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SnowMan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SnowParticle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Terrian.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Direct3D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
