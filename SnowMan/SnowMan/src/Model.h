@@ -1,6 +1,7 @@
 #pragma once
-#include "Direct3D.h"
-
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <windows.h>
 
 class Model
 {

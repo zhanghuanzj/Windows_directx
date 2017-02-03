@@ -10,7 +10,7 @@
 #define SMAP_SIZE 3000
 
 
-#define SHADOW_EPSILON 0.000015f
+#define SHADOW_EPSILON 0.000025f
 
 
 float4x4 WorldMatrix;
@@ -83,23 +83,28 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 	float3 vNormal : TEXCOORD2, 
 	float4 vPosLight : TEXCOORD3) : COLOR
 {
+	float LightAmount = 1.0f;
 	float4 Diffuse;
 	float2 ShadowTexC = 0.5 * vPosLight.xy / vPosLight.w + float2(0.5, 0.5);
 	ShadowTexC.y = 1.0f - ShadowTexC.y;
 
-	float2 texelpos = SMAP_SIZE * ShadowTexC;
-	float2 lerps = frac(texelpos);
-	//这里使用的是2x2 percentage closest filtering,因此是采的邻近的四个点，判断它们是否在阴影中，
-	float sourcevals[4];
-	sourcevals[0] = (tex2D(ShadowSampler, ShadowTexC) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
-	sourcevals[1] = (tex2D(ShadowSampler, ShadowTexC + float2(1.0 / SMAP_SIZE, 0)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
-	sourcevals[2] = (tex2D(ShadowSampler, ShadowTexC + float2(0, 1.0 / SMAP_SIZE)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
-	sourcevals[3] = (tex2D(ShadowSampler, ShadowTexC + float2(1.0 / SMAP_SIZE, 1.0 / SMAP_SIZE)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+	if (ShadowTexC.y >= 0 && ShadowTexC.y <= 1.0f&&ShadowTexC.x >= 0 && ShadowTexC.x <= 1.0f)
+	{
+		float2 texelpos = SMAP_SIZE * ShadowTexC;
+		float2 lerps = frac(texelpos);
+		//这里使用的是2x2 percentage closest filtering,因此是采的邻近的四个点，判断它们是否在阴影中，
+		float sourcevals[4];
+		sourcevals[0] = (tex2D(ShadowSampler, ShadowTexC) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+		sourcevals[1] = (tex2D(ShadowSampler, ShadowTexC + float2(1.0 / SMAP_SIZE, 0)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+		sourcevals[2] = (tex2D(ShadowSampler, ShadowTexC + float2(0, 1.0 / SMAP_SIZE)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+		sourcevals[3] = (tex2D(ShadowSampler, ShadowTexC + float2(1.0 / SMAP_SIZE, 1.0 / SMAP_SIZE)) + SHADOW_EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
 
-	// 用lerps 
-	float LightAmount = lerp(lerp(sourcevals[0], sourcevals[1], lerps.x),
-		lerp(sourcevals[2], sourcevals[3], lerps.x),
-		lerps.y);
+		// 用lerps 
+		LightAmount = lerp(lerp(sourcevals[0], sourcevals[1], lerps.x),
+			lerp(sourcevals[2], sourcevals[3], lerps.x),
+			lerps.y);
+	}
+	
 
 	//float LightAmount = (tex2D(ShadowSampler, ShadowTexC) + SHADOW_EPSILON< vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
 	// Light

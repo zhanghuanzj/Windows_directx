@@ -41,11 +41,12 @@ public:
 	void light_on();
 	void light_off();
 	void caculate_light_matrix();
+	LPDIRECT3DDEVICE9 get_pd3d() { return pD3DXDevice; }
 	//Îö¹¹
 	~DirectX();
 
 private:
-	DirectX() :pD3DXDevice(nullptr),objects(5) {}
+	DirectX() :pD3DXDevice(nullptr){}
 
 	IDirect3DDevice9* pD3DXDevice;
 	LPDIRECT3DTEXTURE9              ShadowMap = nullptr;
@@ -58,8 +59,8 @@ private:
 	D3DXMATRIX light_proj_matrix;
 	LPD3DXFONT font;
 	RECT formatRect;
+	LPD3DXEFFECT pEffect = nullptr;
 	
-	vector<Object> objects;
 	SnowMan *snowMan1 = nullptr;
 	SnowMan *snowMan2 = nullptr;
 	Cube *cube = nullptr;

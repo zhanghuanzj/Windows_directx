@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="VertexShader.fx" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="src\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -68,5 +65,14 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SnowMan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader.fx" />
   </ItemGroup>
 </Project>

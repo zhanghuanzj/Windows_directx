@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Direct3D.h"
-#include "Window.h"
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <windows.h>
+#include <fstream>
 #include "Vertex.h"
 
 using namespace std;

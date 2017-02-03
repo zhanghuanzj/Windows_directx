@@ -1,6 +1,6 @@
 #pragma once
 #include <dinput.h>
-#include "Direct3D.h"
+#include "CommonUtil.h"
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")

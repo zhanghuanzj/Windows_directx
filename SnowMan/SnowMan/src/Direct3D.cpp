@@ -1,11 +1,11 @@
 #include "Direct3D.h"
-LPD3DXEFFECT pEffect;
+
 
 LPD3DXMESH texMesh;
 LPD3DXMESH mesh;
 int DirectX::n = 1;
 D3DXVECTOR4 DirectX::LightAmbient = D3DXVECTOR4(0.4f, 0.4f, 0.4f, 1.0f);
-D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.1f, 1.1f, 1.1f, 1.0f);
+D3DXVECTOR4 DirectX::LightDiffuse = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 D3DXVECTOR4 DirectX::LightDirection = D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 0.0f);
 D3DMATERIAL9 snowMtrl;
 bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int height)
@@ -55,11 +55,6 @@ bool DirectX::initialDirectX(HINSTANCE hInstance, HWND hwnd, int width, int heig
 	//DirectInput
 	pDirectInput = new DirectInput();
 	pDirectInput->init(hwnd, hInstance, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-
-	//Font setting
-	font = nullptr;
-	D3DXCreateFont(pD3DXDevice, 36, 0, 0, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, 0, "Î¢ÈíÑÅºÚ", &font);
-	GetClientRect(hwnd, &formatRect);
 
 	
 	object_initialize();
@@ -164,7 +159,7 @@ void DirectX::caculate_light_matrix()
 	//D3DXVECTOR3 rightVector = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 	//D3DXVECTOR3 upVector = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
 	//D3DXVECTOR3 lookVector = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
-	float pos = 200.0f;
+	float pos = 150.0f;
 	D3DXVECTOR3 position = D3DXVECTOR3(pos, pos, -pos);
 	D3DXVECTOR3 tarPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 rightVector = D3DXVECTOR3(1.0f, 0.0f, 1.0f);
